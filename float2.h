@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 class float2
 {
@@ -14,6 +15,8 @@ public:
 
  	float Magnitude() const;
   	void Normalize();
+
+	std::string ToString() const;
 
 	float2& operator= (const float2& Src);
 	bool operator== (const float2& cmp) const;

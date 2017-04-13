@@ -1,6 +1,8 @@
 #pragma once
 #include "float3.h"
 
+#include <string>
+
 class Quaternion
 {
 public:
@@ -17,6 +19,8 @@ public:
 	void Normalize3();
 	Quaternion Conjugate() const;
 	float3 ToFloat3() const;
+	std::string ToString() const;
+
 	Quaternion operator* (const Quaternion& Src) const;
 	Quaternion& operator*= (const Quaternion& Src);
 	Quaternion& operator+= (const float3& Src);

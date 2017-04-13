@@ -1,5 +1,7 @@
 #include "mat4.h"
 #include <cmath>
+#include <sstream>
+#include <iomanip>
 
 mat4::mat4()
 {
@@ -8,11 +10,10 @@ mat4::mat4()
 			p[col][row] = 0.0;
 }
 
-mat4::mat4(float num)
+mat4::mat4(float num) : mat4()
 {
-	for(int col = 0; col < 4; col++)
-		for(int row = 0; row < 4; row++)
-			p[col][row] = num;
+	for(int i = 0; i < 4; i++)
+		p[i][i] = num;
 }
 
 mat4::mat4(float* m)
@@ -27,6 +28,31 @@ mat4::mat4(const mat4& A)
 	for(int col = 0; col < 4; col++)
 		for(int row = 0; row < 4; row++)
 			p[col][row] = A.p[col][row];
+}
+
+std::string mat4::ToString() const
+{
+	std::stringstream ss;
+	ss << "---------------------------------------------\n";
+	for(unsigned int row = 0; row < 3; row++)
+	{
+		ss << "| ";
+		for(unsigned int col = 0; col < 3; col++)
+		{
+			ss << std::setfill(' ') << std::setw(8) << p[col][row] << " | ";
+		}
+		ss << std::setfill(' ') << std::setw(8) << p[3][row] << " |\n";
+		ss << "---------------------------------------------\n";
+	}
+	ss << "| ";
+	for(unsigned int col = 0; col < 3; col++)
+	{
+		ss << std::setfill(' ') << std::setw(8) << p[col][3] << " | ";
+	}
+	ss << std::setfill(' ') << std::setw(8) << p[3][3] << " |\n";
+	ss << "---------------------------------------------";
+
+	return ss.str();
 }
 
 mat4 mat4::operator* (const mat4& B) const

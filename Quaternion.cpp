@@ -1,5 +1,8 @@
 #include "Quaternion.h"
+
 #include <cmath>
+#include <sstream>
+#include <iomanip>
 
 Quaternion::Quaternion()
 {
@@ -76,6 +79,14 @@ Quaternion Quaternion::Conjugate() const
 float3 Quaternion::ToFloat3() const
 {
 	return float3(x, y, z);
+}
+
+std::string Quaternion::ToString() const
+{
+	std::stringstream ss;
+	ss << "( " << x << " , " << y << " , " << z << " , " << w << " )";
+
+	return ss.str();
 }
 
 Quaternion Quaternion::operator* (const Quaternion& Src) const

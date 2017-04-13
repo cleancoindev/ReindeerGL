@@ -16,6 +16,7 @@ bool shift = false;
 const float3 homePos(0, 0, 4);
 shared_ptr<Triangle> tri;
 shared_ptr<CubeObj> cube;
+shared_ptr<GravityPlane> grvty;
 
 inline void MoveCam()
 {
@@ -31,7 +32,8 @@ void Display()
 	static Quaternion q(1, 1, 1, 1);
 	q.w = 4;
 	q.w *= gl.DeltaTime();
-	cube->Rotate(q);
+	grvty->Rotate(q);
+	cube->Rotate(q.Conjugate());
 
 	gl.DrawAll();
 
@@ -180,12 +182,18 @@ int main(int argc, char** argv)
     //tri = make_shared<Triangle>();
     //gl.AddPlane("./Images/Globe.png");
     //gl.AddLine("./Images/Yellow.png");
-    std::shared_ptr<PlaneObj> grvty = make_shared<PlaneObj>("./Images/deep_sea.png");
+    grvty = make_shared<GravityPlane>();
     gl.AddObject(static_pointer_cast<Object3D>(grvty));
-    grvty->Translate(float3(0, -1.01, 0));
-    grvty->Rotate(Quaternion(1, 0, 0, GLMath::PI/2));
-    grvty->SetScale(25.0f);
+    grvty->SetScale(float3(0.5));
+
+    std::shared_ptr<PlaneObj> pln = make_shared<PlaneObj>("./Images/deep_sea.png");
+    gl.AddObject(static_pointer_cast<Object3D>(pln));
+    pln->Translate(float3(0, -1.01, 0));
+    pln->Rotate(Quaternion(1, 0, 0, GLMath::PI/2));
+    pln->SetScale(25.0f);
+
     cube = gl.AddCube("./Images/Globe.png");
+    cube->SetPosition(float3(-10, 2, -5));
 
     // pnl->SetPosition(float3(0, 0, 0));
     //shared_ptr<LineObj> line = make_shared<CubeObj>("./Images/Blue.png");

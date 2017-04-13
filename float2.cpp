@@ -1,5 +1,8 @@
-#include <cmath>
 #include "float2.h"
+
+#include <cmath>
+#include <sstream>
+#include <iomanip>
 
 float2::float2(float x, float y)
 {
@@ -49,6 +52,14 @@ void float2::Normalize()
 	float mag = Magnitude();
 	n[0] /= mag;
 	n[1] /= mag;
+}
+
+std::string float2::ToString() const
+{
+	std::stringstream ss;
+	ss << "[ " << n[0] << " , " << n[1] << " ]";
+
+	return ss.str();
 }
 
 float2& float2::operator= (const float2& Src)

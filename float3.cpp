@@ -2,6 +2,8 @@
 
 #include <cmath>
 #include <utility>
+#include <sstream>
+#include <iomanip>
 
 float3::float3(float x, float y, float z)
 {
@@ -89,6 +91,14 @@ float3 float3::Norm() const
 	float3 r(*this);
 	r.Normalize();
 	return std::move(r);
+}
+
+std::string float3::ToString() const
+{
+	std::stringstream ss;
+	ss << "< " << n[0] << " , " << n[1] << " , " << n[2] << " >";
+
+	return ss.str();
 }
 
 float3& float3::operator= (const float3& Src)
