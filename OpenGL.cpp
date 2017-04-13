@@ -12,13 +12,15 @@ OpenGL::OpenGL(int argc, char** argv, int width, int height, const std::string& 
 	GLInit(argc, argv, width, height, title);
 }
 
-void OpenGL::GLInit(int argc, char** argv, int width, int height, const std::string& title)
+void OpenGL::GLInit(int argc, char** argv, int widthIn, int heightIn, const std::string& title)
 {
 	filling = true;
 	fullscreen = false;
 	//Position = float3(1.570796327, 0, 0);
 	framesPerSecond = 60.0f;						// not the worst guess
 	deltaTime = 0.0f;
+	width = widthIn;
+	height = heightIn;
 
 	// FREEGLUT
 	glutInit(&argc, argv);
@@ -45,7 +47,7 @@ void OpenGL::GLInit(int argc, char** argv, int width, int height, const std::str
 
 	// GL
 	glEnable(GL_DEPTH_TEST);
-	glClearColor(0.2, 0.3, 0.1, 1.0);
+	glClearColor(0.1, 0.1, 0.2, 1.0);
 	int fbWidth = width, fbHeight = height;
 	glViewport(0, 0, fbWidth, fbHeight);
 }
@@ -56,9 +58,14 @@ void OpenGL::DrawAll()
 	glEnable(GL_DEPTH);
 	CalcFPS();
 
-	// mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.2f, 3000.0f) * GLMath::Rotate(Rotation) * GLMath::Translate(-Position);
-	// mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.2f, 3000.0f) * GLMath::Translate(-Position);
-	mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, 16.0f/9.0f, 0.2f, 1000.0f) * GLMath::Rotate(Rotation) * GLMath::Translate(-Position);
+	mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.05f, 1000.0f) * GLMath::Rotate(Rotation) * GLMath::Translate(-Position);
+
+	// Experimental camera rotations
+	// Quaternion q1(1, 0, 0, Rotation.x());
+	// q1.Normalize3();
+	// Quaternion q2(0, 1, 0, Rotation.y());
+	// q2.Normalize3();
+	// mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.05f, 1000.0f) * GLMath::Rotate(q1*q2) * GLMath::Translate(-Position);
 
 	for(std::shared_ptr<Object3D> object : objects)
 	{
@@ -92,11 +99,19 @@ void OpenGL::Fullscreen()
 	fullscreen ? glutReshapeWindow(800, 600) : glutFullScreen();
 	fullscreen = !fullscreen;
 }
+bool OpenGL::IsFullscreen() const
+{
+	return fullscreen;
+}
 
 void OpenGL::Wireframe()
 {
 	filling = !filling;
 	filling ? glPolygonMode(GL_FRONT_AND_BACK, GL_FILL) : glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+}
+bool OpenGL::IsFilling() const
+{
+	return filling;
 }
 
 void OpenGL::SaveScreenshot(const std::string& filename)
@@ -174,4 +189,23 @@ int OpenGL::Width() const
 int OpenGL::Height() const
 {
 	return glutGet(GLUT_WINDOW_HEIGHT);
+}
+
+void OpenGL::SetCurrentWindowSize(const unsigned int width, const unsigned int height)
+{
+	this->width = width;
+	this->height = height;
+
+	glViewport(0, 0, width, height);
+	glutPostRedisplay();
+}
+
+void OpenGL::ShowCursor(bool show) const
+{
+	if(show)
+	{
+		glutSetCursor(GLUT_CURSOR_INHERIT);
+	} else {
+		glutSetCursor(GLUT_CURSOR_NONE);
+	}
 }

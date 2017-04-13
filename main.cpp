@@ -31,9 +31,7 @@ void Display()
 	static Quaternion q(1, 1, 1, 1);
 	q.w = 4;
 	q.w *= gl.DeltaTime();
-	// q.Normalize();
-	// cube->Rotate(q);
-	cube->Transform(GLMath::Rotate(q));
+	cube->Rotate(q);
 
 	gl.DrawAll();
 
@@ -53,6 +51,7 @@ void Keyboard(unsigned char key, int x, int y)
 	{
 		case 'r': case 'R':
 			gl.Wireframe();
+			gl.ShowCursor(!gl.IsFilling());
 			break;
 		case 'h': case 'H':
 			gl.Position = homePos;
@@ -147,8 +146,7 @@ void KeyboardUp(unsigned char key, int x, int y)
 
 void Resize(int width, int height)
 {
-	glViewport(0, 0, width, height);
-	glutPostRedisplay();
+	gl.SetCurrentWindowSize(width, height);
 }
 
 void MouseMotion(int x, int y)
@@ -168,7 +166,9 @@ void MouseMotion(int x, int y)
 
 int main(int argc, char** argv)
 {
-	gl.GLInit(argc, argv, 1366, 768, "TestGL");
+	gl.GLInit(argc, argv, 1200, 680, "TestGL");
+	gl.ShowCursor(false);
+
 	gl.Position = homePos;
 	glutDisplayFunc(Display);
 	glutIdleFunc(Display);
@@ -180,7 +180,7 @@ int main(int argc, char** argv)
     //tri = make_shared<Triangle>();
     //gl.AddPlane("./Images/Globe.png");
     //gl.AddLine("./Images/Yellow.png");
-    std::shared_ptr<GravityPlane> grvty = make_shared<GravityPlane>();
+    std::shared_ptr<PlaneObj> grvty = make_shared<PlaneObj>("./Images/deep_sea.png");
     gl.AddObject(static_pointer_cast<Object3D>(grvty));
     grvty->Translate(float3(0, -1.01, 0));
     grvty->Rotate(Quaternion(1, 0, 0, GLMath::PI/2));

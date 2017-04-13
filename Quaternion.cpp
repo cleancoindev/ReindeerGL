@@ -65,7 +65,6 @@ void Quaternion::Normalize3()
 		x /= magnitude;
 		y /= magnitude;
 		z /= magnitude;
-		// w /= magnitude;
 	}
 }
 

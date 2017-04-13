@@ -29,7 +29,9 @@ public:
 	void CalcFPS();
 	void StartFPS();
 	void Fullscreen();
+	bool IsFullscreen() const;
 	void Wireframe();
+	bool IsFilling() const;
 	void SaveScreenshot(const std::string& filename);
 
 	std::shared_ptr<CubeObj> AddCube(const std::string& textureFile);
@@ -42,6 +44,8 @@ public:
 	float DeltaTime() const;
 	int Width() const;
 	int Height() const;
+	void SetCurrentWindowSize(const unsigned int width, const unsigned int height);
+	void ShowCursor(bool show) const;
 
 private:
 	GLuint windowId;
