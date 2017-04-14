@@ -9,8 +9,6 @@
 #include "Shaders.h"
 #include "GLMath.h"
 
-#define MEMBER_OFFSET(s,m) ((char *)NULL + (offsetof(s,m)))
-
 class Object3D
 {
 public:
@@ -29,6 +27,9 @@ public:
 	void Rotate(const Quaternion& rotation);
 	void SetVelocity(const float3& velocity);
 	void Transform(const mat4& transform);
+
+	void Texture(const std::string& ImgFilename);
+	void ColourSolid(const float3& redGreenBlue, float alpha);		// [0 - 1] range
 
 	bool Drawing2D() const;
 	void Set2D(bool render2Dimensional);
@@ -54,17 +55,14 @@ protected:
 
 	Object3D(int Verts, int Coords, int Mode);
 
-	// Creates VertexArrayObject and VertexBufferObjects for vertices and TexCoords
-	// Opens ImgFilename as texture and opens the specified shader files
-	void SetupVerticesAndShaders(const std::string& ImgFilename, const std::string& vertName, const std::string& fragName);
-	void SetupVerticesAndShaders() {
-		SetupVerticesAndShaders("", "dummy.glslv", "dummy.glslf");
-	}
-	void SetupVerticesAndShaders(const std::string& ImgFilename) {
-		if(ImgFilename.length())
-			SetupVerticesAndShaders(ImgFilename, "texture.glslv", "texture.glslf");
-		else
-			SetupVerticesAndShaders();
+	// // Creates VertexArrayObject and VertexBufferObjects for vertices and TexCoords
+	void SetupVerticesAndInitialize();
+
+	// Opens the specified shader files & compiles/links them and opens ImgFilename as texture if non-empty
+	void SetShaders(const std::string& vertName, const std::string& fragName, const std::string& ImgFilename = "");
+	void ClearShaders();
+	void SetShaders() {
+		SetShaders("dummy.glslv", "dummy.glslf");
 	}
 
 	void UpdateModelMatrix();

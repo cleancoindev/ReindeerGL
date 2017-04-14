@@ -47,6 +47,13 @@ void OpenGL::GLInit(int argc, char** argv, int widthIn, int heightIn, const std:
 
 	// GL
 	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable( GL_BLEND );
+
+	// Objects should be created expecting CCW culling
+	// glEnable(GL_CULL_FACE);
+	// glFrontFace(GL_CCW);
+
 	glClearColor(0.1, 0.1, 0.2, 1.0);
 	int fbWidth = width, fbHeight = height;
 	glViewport(0, 0, fbWidth, fbHeight);
@@ -177,7 +184,7 @@ void OpenGL::AddPlane(const std::shared_ptr<PlaneObj>& planePtr)
 std::shared_ptr<Triangle> OpenGL::AddTriangle(const std::string& textureFile)
 {
 	std::shared_ptr<Triangle> triPtr = std::make_shared<Triangle>(textureFile);
-	objects.push_back(std::static_pointer_cast<Object3D>(triPtr));
+	objects.push_back(OBJECT3D_PTR(triPtr));
 	return triPtr;
 }
 void OpenGL::AddTriangle(const std::shared_ptr<Triangle>& triPtr)

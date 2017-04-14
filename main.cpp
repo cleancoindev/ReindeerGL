@@ -26,8 +26,8 @@ inline void MoveCam()
 void Display()
 {
 	MoveCam();
-	//tri->SetPosition(float3(cosf(float(tick)/30.0f), 0, 0));
-	//tri->SetScale(float3(cosf(float(tick)/50.0f)));
+	tri->SetPosition(float3(cosf(float(tick)/30.0f), 0, 0));
+	tri->SetScale(float3(cosf(float(tick)/50.0f)));
 	//tri->Transform(GLMath::RotateY(0.2f));
 	static Quaternion q(1, 1, 1, 1);
 	q.w = 4;

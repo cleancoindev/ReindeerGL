@@ -1,89 +1,136 @@
 #include "Objects.h"
 
-float3 C_Vertices[24] = {
+float3 C_Vertices[36] = {
 	// Front face
 	{float3(-1, -1,  1)}, // 2
+	{float3( 1, -1,  1)}, // 3
 	{float3(-1,  1,  1)}, // 1
+
 	{float3( 1, -1,  1)}, // 3
 	{float3( 1,  1,  1)}, // 0
+	{float3(-1,  1,  1)}, // 1
+
 
 	// Right face
 	{float3( 1,  1,  1)}, // 0
 	{float3( 1, -1,  1)}, // 3
 	{float3( 1,  1, -1)}, // 7
+
+	{float3( 1,  1, -1)}, // 7
+	{float3( 1, -1,  1)}, // 3
 	{float3( 1, -1, -1)}, // 4
+
 
 	// Bottom face
 	{float3( 1, -1, -1)}, // 4
 	{float3( 1, -1,  1)}, // 3
 	{float3(-1, -1, -1)}, // 5
+
+	{float3(-1, -1, -1)}, // 5
+	{float3( 1, -1,  1)}, // 3
 	{float3(-1, -1,  1)}, // 2
+
 
 	// Left face
 	{float3(-1, -1,  1)}, // 2
+	{float3(-1,  1,  1)}, // 1
 	{float3(-1, -1, -1)}, // 5
+
 	{float3(-1,  1,  1)}, // 1
 	{float3(-1,  1, -1)}, // 6
+	{float3(-1, -1, -1)}, // 5
+
 
 	// Top face
 	{float3(-1,  1,  1)}, // 1
+	{float3( 1,  1,  1)}, // 0
 	{float3(-1,  1, -1)}, // 6
+
 	{float3( 1,  1,  1)}, // 0
 	{float3( 1,  1, -1)}, // 7
+	{float3(-1,  1, -1)}, // 6
+
 
 	// Back face
 	{float3( 1,  1, -1)}, // 7
 	{float3( 1, -1, -1)}, // 4
 	{float3(-1,  1, -1)}, // 6
+
+	{float3(-1,  1, -1)}, // 6
+	{float3( 1, -1, -1)}, // 4
 	{float3(-1, -1, -1)}, // 5
 };
-float2 C_TexCoords[24] = {
+float2 C_TexCoords[36] = {
 	// Front face
 	{float2(0, 0)}, // bottom left
+	{float2(1, 0)}, // bottom right
 	{float2(0, 1)}, // top left
+
 	{float2(1, 0)}, // bottom right
 	{float2(1, 1)}, // top right
+	{float2(0, 1)}, // top left
+
 
 	// Right face
 	{float2(0, 1)}, // top left
 	{float2(0, 0)}, // bottom left
 	{float2(1, 1)}, // top right
+
+	{float2(1, 1)}, // top right
+	{float2(0, 0)}, // bottom left
 	{float2(1, 0)}, // bottom right
+
 
 	// Bottom face
 	{float2(1, 0)}, // bottom right
 	{float2(1, 1)}, // top right
 	{float2(0, 0)}, // bottom left
+
+	{float2(0, 0)}, // bottom left
+	{float2(1, 1)}, // top right
 	{float2(0, 1)}, // top left
+
 
 	// Left face
 	{float2(1, 0)}, // bottom right
-	{float2(0, 0)}, // bottom left
-	{float2(0, 1)}, // top left
 	{float2(1, 1)}, // top right
+	{float2(0, 0)}, // bottom left
+
+	{float2(1, 1)}, // top right
+	{float2(0, 1)}, // top left
+	{float2(0, 0)}, // bottom left
+
 
 	// Top face
 	{float2(0, 0)}, // bottom left
+	{float2(1, 0)}, // bottom right
 	{float2(0, 1)}, // top left
+
 	{float2(1, 0)}, // bottom right
 	{float2(1, 1)}, // top right
+	{float2(0, 1)}, // top left
+
 
 	// Back face
 	{float2(0, 1)}, // top left
 	{float2(0, 0)}, // bottom left
 	{float2(1, 1)}, // top right
+
+	{float2(1, 1)}, // top right
+	{float2(0, 0)}, // bottom left
 	{float2(1, 0)}, // bottom rightSet2D
 };
 
-CubeObj::CubeObj(const std::string& texfilePath) : Object3D(24, 24, GL_TRIANGLE_STRIP)
+CubeObj::CubeObj(const std::string& texfilePath) : Object3D(36, 36, GL_TRIANGLES)
 {
-	for(int i = 0; i < 24; i++)
+	for(unsigned int i = 0; i < verts; i++)
 	{
 		vertices[i] = C_Vertices[i];
 		texCoords[i] = C_TexCoords[i];
 	}
 
-	SetupVerticesAndShaders(texfilePath);
+	SetupVerticesAndInitialize();
+	Texture(texfilePath);
 }
 
 
@@ -103,7 +150,8 @@ LineObj::LineObj(const std::string& texfilePath) : Object3D(2, 2, GL_LINES)
 	texCoords[0] = L_TexCoords[0];
 	texCoords[1] = L_TexCoords[1];
 
-	SetupVerticesAndShaders(texfilePath);
+	SetupVerticesAndInitialize();
+	Texture(texfilePath);
 }
 
 
@@ -122,45 +170,49 @@ float2 P_TexCoords[4] = {
 
 PlaneObj::PlaneObj(const std::string& texfilePath) : Object3D(4, 4, GL_TRIANGLE_STRIP)
 {
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < verts; i++)
 	{
 		vertices[i] = P_Vertices[i];
 		texCoords[i] = P_TexCoords[i];
 	}
 
-	SetupVerticesAndShaders(texfilePath);
+	SetupVerticesAndInitialize();
+	Texture(texfilePath);
 }
 
 GravityPlane::GravityPlane() : Object3D(4, 4, GL_TRIANGLE_STRIP)
 {
-	for(int i = 0; i < 4; i++)
+	for(int i = 0; i < verts; i++)
 	{
 		vertices[i] = P_Vertices[i];
 		texCoords[i] = P_TexCoords[i];
 	}
 
-	SetupVerticesAndShaders("./Images/myPalette.png", "gravityTex.glslv", "gravityTex.glslf");
+	SetupVerticesAndInitialize();
+	SetShaders("gravityTex.glslv", "gravityTex.glslf", "./Images/myPalette.png");
 }
 
 
 float3 T_Vertices[3] = {
-        float3(-1, -1, 0),
-        float3(0, 1, 0),
-        float3(1, -1, 0),
+    float3(1, -1, 0),
+    float3(0, 1, 0),
+    float3(-1, -1, 0),
 };
 float2 T_TexCoords[3] = {
-        float2(0, 0),
-        float2(0.5, 1),
-        float2(1, 0),
+    float2(1, 0),
+    float2(0.5, 1),
+	float2(0, 0),
 };
 Triangle::Triangle(const std::string& texfilePath) : Object3D(3, 3, GL_TRIANGLES)
 {
-	for(int i = 0; i < 3; i++)
+	for(int i = 0; i < verts; i++)
 	{
         	vertices[i] = T_Vertices[i];
             texCoords[i] = T_TexCoords[i];
 	}
-	SetupVerticesAndShaders(texfilePath);
+
+	SetupVerticesAndInitialize();
+	Texture(texfilePath);
 }
 
 
@@ -189,16 +241,17 @@ MeshObj::MeshObj(unsigned int X, unsigned int Y, const std::string& texfilePath,
 				vertices[vertCount] = float3(2 * float(i+1)/float(x-1) - 1, 2 * float(j)/float(y-1) - 1, 0);
 		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
 
-		        vertices[vertCount] = float3(2 * float(i)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
-		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
-
 		        vertices[vertCount] = float3(2 * float(i+1)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
 		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j+1)/float(y-1));
+
+		        vertices[vertCount] = float3(2 * float(i)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
+		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
 			}
 		}
 	}
 
-	SetupVerticesAndShaders(texfilePath, vertShaderFile, fragShaderFile);
+	SetupVerticesAndInitialize();
+	SetShaders(vertShaderFile, fragShaderFile, texfilePath);
 }
 
 

@@ -15,6 +15,8 @@
 #include "Shaders.h"
 #include "GLMath.h"
 
+#define OBJECT3D_PTR(ptr) std::static_pointer_cast<Object3D>(ptr)
+
 class OpenGL
 {
 public:
