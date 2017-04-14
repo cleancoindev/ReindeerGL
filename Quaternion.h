@@ -11,9 +11,10 @@ public:
 	Quaternion();
 	Quaternion(float x, float y, float z, float w);
 	Quaternion(float k);
-	Quaternion(const float3& num, float w = 1);
+	Quaternion(const float3& num, float w = 0);
 	Quaternion(const Quaternion& q);
 
+	float3 RotatePoint(const float3& p) const;
   	float Magnitude() const;
 	void Normalize();
 	void Normalize3();

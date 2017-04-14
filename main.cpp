@@ -179,21 +179,25 @@ int main(int argc, char** argv)
 	glutPassiveMotionFunc(MouseMotion);
 	glutReshapeFunc(Resize);
 
-    //tri = make_shared<Triangle>();
-    //gl.AddPlane("./Images/Globe.png");
-    //gl.AddLine("./Images/Yellow.png");
+    tri = make_shared<Triangle>("./Images/myPalette.png");
+    gl.AddTriangle(tri);
+
     grvty = make_shared<GravityPlane>();
     gl.AddObject(static_pointer_cast<Object3D>(grvty));
     grvty->SetScale(float3(0.5));
 
     std::shared_ptr<PlaneObj> pln = make_shared<PlaneObj>("./Images/deep_sea.png");
-    gl.AddObject(static_pointer_cast<Object3D>(pln));
+    gl.AddPlane(pln);
     pln->Translate(float3(0, -1.01, 0));
     pln->Rotate(Quaternion(1, 0, 0, GLMath::PI/2));
     pln->SetScale(25.0f);
 
     cube = gl.AddCube("./Images/Globe.png");
     cube->SetPosition(float3(-10, 2, -5));
+
+    std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>(100, 100, "./Images/ScreenShot9.bmp", "meshExample.glslv", "texture.glslf");
+    mesh->SetPosition(float3(0, 0, -5));
+    gl.AddObject(std::static_pointer_cast<Object3D>(mesh));
 
     // pnl->SetPosition(float3(0, 0, 0));
     //shared_ptr<LineObj> line = make_shared<CubeObj>("./Images/Blue.png");
@@ -202,7 +206,6 @@ int main(int argc, char** argv)
     //cube->Rotate(Quaternion(1,1,1,0.2));
     //cube->SetPosition(float3(0, 0, 3));
     // gl.AddObject(static_pointer_cast<Object3D>(line));
-    //gl.AddObject(static_pointer_cast<Object3D>(tri));
 
     gl.StartFPS();
     glutMainLoop();

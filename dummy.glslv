@@ -1,8 +1,9 @@
 #version 400
-in vec3 vp;
+layout(location=0) in vec3 inPosition;
 
-uniform mat4 MVP;
+uniform mat4 MVP;	// Model-View-Projection matrix
 
-void main() {
-	gl_Position = MVP * vec4(vp, 1.0);
+void main(void)
+{
+        gl_Position = MVP * vec4(inPosition, 1);
 }

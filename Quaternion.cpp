@@ -44,6 +44,11 @@ Quaternion::Quaternion(const Quaternion& q)
 	w = q.w;
 }
 
+float3 Quaternion::RotatePoint(const float3& p) const
+{
+	return ((*this) * Quaternion(p, 0) * Conjugate()).ToFloat3();
+}
+
 float Quaternion::Magnitude() const
 {
   	return sqrt((x * x) + (y * y) + (z * z) + (w * w));

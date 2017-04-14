@@ -59,6 +59,7 @@ void OpenGL::DrawAll()
 	CalcFPS();
 
 	mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.05f, 1000.0f) * GLMath::Rotate(Rotation) * GLMath::Translate(-Position);
+	mat4 twoDimensionalMatrix = GLMath::Scale(float3(float(height) / float(width), 1, 1));
 
 	// Experimental camera rotations
 	// Quaternion q1(1, 0, 0, Rotation.x());
@@ -69,7 +70,7 @@ void OpenGL::DrawAll()
 
 	for(std::shared_ptr<Object3D> object : objects)
 	{
-		object->Draw(projectionViewMatrix);
+		object->Draw(object->Drawing2D() ? twoDimensionalMatrix : projectionViewMatrix);
 	}
 
 	glutSwapBuffers();
@@ -146,12 +147,20 @@ std::shared_ptr<CubeObj> OpenGL::AddCube(const std::string& textureFile)
 	objects.push_back(std::static_pointer_cast<Object3D>(cubePtr));
 	return cubePtr;
 }
+void OpenGL::AddCube(const std::shared_ptr<CubeObj>& cubePtr)
+{
+	objects.push_back(std::dynamic_pointer_cast<Object3D>(cubePtr));
+}
 
 std::shared_ptr<LineObj> OpenGL::AddLine(const std::string& textureFile)
 {
 	std::shared_ptr<LineObj> linePtr = std::make_shared<LineObj>(textureFile);
 	objects.push_back(std::static_pointer_cast<Object3D>(linePtr));
 	return linePtr;
+}
+void OpenGL::AddLine(const std::shared_ptr<LineObj>& linePtr)
+{
+	objects.push_back(std::dynamic_pointer_cast<Object3D>(linePtr));
 }
 
 std::shared_ptr<PlaneObj> OpenGL::AddPlane(const std::string& textureFile)
@@ -160,8 +169,23 @@ std::shared_ptr<PlaneObj> OpenGL::AddPlane(const std::string& textureFile)
 	objects.push_back(std::static_pointer_cast<Object3D>(planePtr));
 	return planePtr;
 }
+void OpenGL::AddPlane(const std::shared_ptr<PlaneObj>& planePtr)
+{
+	objects.push_back(std::dynamic_pointer_cast<Object3D>(planePtr));
+}
 
-void OpenGL::AddObject(std::shared_ptr<Object3D> object)
+std::shared_ptr<Triangle> OpenGL::AddTriangle(const std::string& textureFile)
+{
+	std::shared_ptr<Triangle> triPtr = std::make_shared<Triangle>(textureFile);
+	objects.push_back(std::static_pointer_cast<Object3D>(triPtr));
+	return triPtr;
+}
+void OpenGL::AddTriangle(const std::shared_ptr<Triangle>& triPtr)
+{
+	objects.push_back(std::dynamic_pointer_cast<Object3D>(triPtr));
+}
+
+void OpenGL::AddObject(const std::shared_ptr<Object3D>& object)
 {
 	objects.push_back(object);
 }

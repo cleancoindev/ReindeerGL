@@ -72,7 +72,7 @@ float2 C_TexCoords[24] = {
 	{float2(0, 1)}, // top left
 	{float2(0, 0)}, // bottom left
 	{float2(1, 1)}, // top right
-	{float2(1, 0)}, // bottom right
+	{float2(1, 0)}, // bottom rightSet2D
 };
 
 CubeObj::CubeObj(const std::string& texfilePath) : Object3D(24, 24, GL_TRIANGLE_STRIP)
@@ -83,7 +83,7 @@ CubeObj::CubeObj(const std::string& texfilePath) : Object3D(24, 24, GL_TRIANGLE_
 		texCoords[i] = C_TexCoords[i];
 	}
 
-	SetupVerticesAndShaders(texfilePath, "planeMap.glslv", "textureFrag.glslf");
+	SetupVerticesAndShaders(texfilePath);
 }
 
 
@@ -103,7 +103,7 @@ LineObj::LineObj(const std::string& texfilePath) : Object3D(2, 2, GL_LINES)
 	texCoords[0] = L_TexCoords[0];
 	texCoords[1] = L_TexCoords[1];
 
-	SetupVerticesAndShaders(texfilePath, "planeMap.glslv", "textureFrag.glslf");
+	SetupVerticesAndShaders(texfilePath);
 }
 
 
@@ -128,7 +128,7 @@ PlaneObj::PlaneObj(const std::string& texfilePath) : Object3D(4, 4, GL_TRIANGLE_
 		texCoords[i] = P_TexCoords[i];
 	}
 
-	SetupVerticesAndShaders(texfilePath, "planeMap.glslv", "textureFrag.glslf");
+	SetupVerticesAndShaders(texfilePath);
 }
 
 GravityPlane::GravityPlane() : Object3D(4, 4, GL_TRIANGLE_STRIP)
@@ -142,24 +142,63 @@ GravityPlane::GravityPlane() : Object3D(4, 4, GL_TRIANGLE_STRIP)
 	SetupVerticesAndShaders("./Images/myPalette.png", "gravityTex.glslv", "gravityTex.glslf");
 }
 
-GLuint GravityPlane::GetP() const
-{
-	return programId;
-}
 
 float3 T_Vertices[3] = {
         float3(-1, -1, 0),
         float3(0, 1, 0),
         float3(1, -1, 0),
 };
-Triangle::Triangle() : Object3D(3, 0, GL_TRIANGLES)
+float2 T_TexCoords[3] = {
+        float2(0, 0),
+        float2(0.5, 1),
+        float2(1, 0),
+};
+Triangle::Triangle(const std::string& texfilePath) : Object3D(3, 3, GL_TRIANGLES)
 {
 	for(int i = 0; i < 3; i++)
 	{
         	vertices[i] = T_Vertices[i];
-                //texCoords[i] = P_TexCoords[i];
+            texCoords[i] = T_TexCoords[i];
 	}
-	SetupVerticesAndShaders("");
+	SetupVerticesAndShaders(texfilePath);
+}
+
+
+MeshObj::MeshObj(unsigned int X, unsigned int Y, const std::string& texfilePath, const std::string& vertShaderFile, const std::string& fragShaderFile) :
+	x(X), y(Y), Object3D(3*2*(X-1)*(Y-1), 3*2*(X-1)*(Y-1), GL_TRIANGLES)
+{
+	if(y && x)
+	{
+		unsigned int vertCount = 0;
+		for(int i = 0; i < x-1; i++)
+		{
+			for(unsigned int j = 0; j < y-1; j++)
+			{
+				// Triangle One
+				vertices[vertCount] = float3(2 * float(i)/float(x-1) - 1, 2 * float(j)/float(y-1) - 1, 0);
+		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j)/float(y-1));
+
+		        vertices[vertCount] = float3(2 * float(i+1)/float(x-1) - 1, 2 * float(j)/float(y-1) - 1, 0);
+		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
+
+		        vertices[vertCount] = float3(2 * float(i)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
+		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
+
+
+		        // Triangle Two
+				vertices[vertCount] = float3(2 * float(i+1)/float(x-1) - 1, 2 * float(j)/float(y-1) - 1, 0);
+		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
+
+		        vertices[vertCount] = float3(2 * float(i)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
+		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
+
+		        vertices[vertCount] = float3(2 * float(i+1)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
+		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j+1)/float(y-1));
+			}
+		}
+	}
+
+	SetupVerticesAndShaders(texfilePath, vertShaderFile, fragShaderFile);
 }
 
 

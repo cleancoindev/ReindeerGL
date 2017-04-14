@@ -35,9 +35,14 @@ public:
 	void SaveScreenshot(const std::string& filename);
 
 	std::shared_ptr<CubeObj> AddCube(const std::string& textureFile);
+	void AddCube(const std::shared_ptr<CubeObj>& cube);
 	std::shared_ptr<LineObj> AddLine(const std::string& textureFile);
+	void AddLine(const std::shared_ptr<LineObj>& cube);
 	std::shared_ptr<PlaneObj> AddPlane(const std::string& textureFile);
-	void AddObject(std::shared_ptr<Object3D> object);
+	void AddPlane(const std::shared_ptr<PlaneObj>& cube);
+	std::shared_ptr<Triangle> AddTriangle(const std::string& textureFile);
+	void AddTriangle(const std::shared_ptr<Triangle>& tri);
+	void AddObject(const std::shared_ptr<Object3D>& object);
 
 	float FramesPerSecond() const;
 	GLuint WindowId() const;

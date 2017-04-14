@@ -21,7 +21,7 @@ public:
 	Object3D& operator=(Object3D& Src) = delete;
 	~Object3D();
 
-	void Draw(const mat4& projectionViewMatrix);
+	virtual void Draw(const mat4& projectionViewMatrix);
 
 	void SetPosition(const float3& newPos);
 	void Translate(const float3& vector);
@@ -30,11 +30,15 @@ public:
 	void SetVelocity(const float3& velocity);
 	void Transform(const mat4& transform);
 
+	bool Drawing2D() const;
+	void Set2D(bool render2Dimensional);
+
 protected:
 	float3 position;
 	mat4 rotationMatrix;
 	float3 velocity;
 	float3 scale;
+	bool draw2D;
 
 	float3* vertices;
 	float2* texCoords;
@@ -47,7 +51,21 @@ protected:
 	GLuint programId, fragmentShaderId, vertexShaderId;
 	bool initialized;
 
+
 	Object3D(int Verts, int Coords, int Mode);
-	void SetupVerticesAndShaders(const std::string& ImgName, const std::string& vertName = "dummy.glslv", const std::string& fragName = "dummy.glslf");
+
+	// Creates VertexArrayObject and VertexBufferObjects for vertices and TexCoords
+	// Opens ImgFilename as texture and opens the specified shader files
+	void SetupVerticesAndShaders(const std::string& ImgFilename, const std::string& vertName, const std::string& fragName);
+	void SetupVerticesAndShaders() {
+		SetupVerticesAndShaders("", "dummy.glslv", "dummy.glslf");
+	}
+	void SetupVerticesAndShaders(const std::string& ImgFilename) {
+		if(ImgFilename.length())
+			SetupVerticesAndShaders(ImgFilename, "texture.glslv", "texture.glslf");
+		else
+			SetupVerticesAndShaders();
+	}
+
 	void UpdateModelMatrix();
 };

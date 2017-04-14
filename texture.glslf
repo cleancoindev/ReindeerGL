@@ -1,5 +1,4 @@
 #version 420
-in vec4 exchPosition;
 in vec2 exchTexCoord;
 out vec4 FragColor;
 

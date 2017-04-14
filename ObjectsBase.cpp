@@ -10,7 +10,12 @@ Object3D::Object3D(int Verts, int Coords, int Mode) : verts(Verts), coords(Coord
 	rotationMatrix = GLMath::Identity();
 	scale = 1.0;
 	Mass = 1;
+
 	initialized = false;
+	draw2D = false;
+	programId = 0;
+	vaoId = 0;
+	vboId = 0;
 
 	if(verts)
 		vertices = new float3[verts];
@@ -101,6 +106,17 @@ void Object3D::SetVelocity(const float3& velocity)
 void Object3D::Transform(const mat4& transform)
 {
 	modelMatrix = transform * modelMatrix;
+}
+
+
+bool Object3D::Drawing2D() const
+{
+	return draw2D;
+}
+
+void Object3D::Set2D(bool rndr2d)
+{
+	draw2D = rndr2d;
 }
 
 

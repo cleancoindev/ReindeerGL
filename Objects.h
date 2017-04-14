@@ -26,22 +26,30 @@ public:
 class SphereObj: public Object3D
 {
 public:
-	SphereObj(unsigned int n, float radius);
+	SphereObj(unsigned int n, const std::string& texturePath);
 
 private:
 	unsigned int SphereFindPoint(unsigned int n);
 };
 
-
 class GravityPlane: public Object3D
 {
 public:
 	GravityPlane();
-	GLuint GetP() const;
 };
 
 class Triangle: public Object3D
 {
 public:
-	Triangle();
+	Triangle(const std::string& texturePath);
+};
+
+class MeshObj : public Object3D
+{
+public:
+	MeshObj(unsigned int X, unsigned int Y, const std::string& texfilePath, const std::string& vertShaderFile, const std::string& fragShaderFile);
+
+private:
+	const unsigned int x;
+	const unsigned int y;
 };
