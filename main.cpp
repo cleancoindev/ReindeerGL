@@ -32,7 +32,7 @@ void Display()
 	static Quaternion q(1, 1, 1, 1);
 	q.w = 4;
 	q.w *= gl.DeltaTime();
-	grvty->Rotate(q);
+	// grvty->Rotate(q);
 	cube->Rotate(q.Conjugate());
 
 	gl.DrawAll();
@@ -182,9 +182,9 @@ int main(int argc, char** argv)
     tri = make_shared<Triangle>("./Images/myPalette.png");
     gl.AddTriangle(tri);
 
-    grvty = make_shared<GravityPlane>();
-    gl.AddObject(static_pointer_cast<Object3D>(grvty));
-    grvty->SetScale(float3(0.5));
+    // grvty = make_shared<GravityPlane>();
+    // gl.AddObject(OBJECT3D_PTR(grvty));
+    // grvty->SetScale(float3(0.5));
 
     std::shared_ptr<PlaneObj> pln = make_shared<PlaneObj>("./Images/deep_sea.png");
     gl.AddPlane(pln);
@@ -195,9 +195,13 @@ int main(int argc, char** argv)
     cube = gl.AddCube("./Images/Globe.png");
     cube->SetPosition(float3(-10, 2, -5));
 
-    std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>(100, 100, "./Images/ScreenShot9.bmp", "meshExample.glslv", "texture.glslf");
-    mesh->SetPosition(float3(0, 0, -5));
-    gl.AddObject(std::static_pointer_cast<Object3D>(mesh));
+    std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>(100, 100, "./Images/myPalette.png", "meshExample.glslv", "texture.glslf");
+    mesh->SetPosition(float3(10, 0, -5));
+    mesh->SetScale(float3(10, 10, 1));
+    mesh->Rotate(Quaternion(1, 0, 0, -GLMath::PI/2));
+    mesh->SetXAxisRange(-5 * GLMath::PI, 5 * GLMath::PI);
+    mesh->SetYAxisRange(-5 * GLMath::PI, 5 * GLMath::PI);
+    gl.AddObject(OBJECT3D_PTR(mesh));
 
     // pnl->SetPosition(float3(0, 0, 0));
     //shared_ptr<LineObj> line = make_shared<CubeObj>("./Images/Blue.png");
@@ -205,7 +209,7 @@ int main(int argc, char** argv)
     // line->Rotate(Quaternion(0, 1, 0, 1.5));
     //cube->Rotate(Quaternion(1,1,1,0.2));
     //cube->SetPosition(float3(0, 0, 3));
-    // gl.AddObject(static_pointer_cast<Object3D>(line));
+    // gl.AddObject(OBJECT3D_PTR(line));
 
     gl.StartFPS();
     glutMainLoop();

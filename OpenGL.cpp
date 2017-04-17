@@ -151,34 +151,34 @@ void OpenGL::SaveScreenshot(const std::string& filename)
 std::shared_ptr<CubeObj> OpenGL::AddCube(const std::string& textureFile)
 {
 	std::shared_ptr<CubeObj> cubePtr = std::make_shared<CubeObj>(textureFile);
-	objects.push_back(std::static_pointer_cast<Object3D>(cubePtr));
+	objects.push_back(OBJECT3D_PTR(cubePtr));
 	return cubePtr;
 }
 void OpenGL::AddCube(const std::shared_ptr<CubeObj>& cubePtr)
 {
-	objects.push_back(std::dynamic_pointer_cast<Object3D>(cubePtr));
+	objects.push_back(OBJECT3D_PTR(cubePtr));
 }
 
 std::shared_ptr<LineObj> OpenGL::AddLine(const std::string& textureFile)
 {
 	std::shared_ptr<LineObj> linePtr = std::make_shared<LineObj>(textureFile);
-	objects.push_back(std::static_pointer_cast<Object3D>(linePtr));
+	objects.push_back(OBJECT3D_PTR(linePtr));
 	return linePtr;
 }
 void OpenGL::AddLine(const std::shared_ptr<LineObj>& linePtr)
 {
-	objects.push_back(std::dynamic_pointer_cast<Object3D>(linePtr));
+	objects.push_back(OBJECT3D_PTR(linePtr));
 }
 
 std::shared_ptr<PlaneObj> OpenGL::AddPlane(const std::string& textureFile)
 {
 	std::shared_ptr<PlaneObj> planePtr = std::make_shared<PlaneObj>(textureFile);
-	objects.push_back(std::static_pointer_cast<Object3D>(planePtr));
+	objects.push_back(OBJECT3D_PTR(planePtr));
 	return planePtr;
 }
 void OpenGL::AddPlane(const std::shared_ptr<PlaneObj>& planePtr)
 {
-	objects.push_back(std::dynamic_pointer_cast<Object3D>(planePtr));
+	objects.push_back(OBJECT3D_PTR(planePtr));
 }
 
 std::shared_ptr<Triangle> OpenGL::AddTriangle(const std::string& textureFile)
@@ -189,7 +189,7 @@ std::shared_ptr<Triangle> OpenGL::AddTriangle(const std::string& textureFile)
 }
 void OpenGL::AddTriangle(const std::shared_ptr<Triangle>& triPtr)
 {
-	objects.push_back(std::dynamic_pointer_cast<Object3D>(triPtr));
+	objects.push_back(OBJECT3D_PTR(triPtr));
 }
 
 void OpenGL::AddObject(const std::shared_ptr<Object3D>& object)

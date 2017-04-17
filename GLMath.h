@@ -6,7 +6,8 @@
 
 namespace GLMath
 {
-	const float PI = 3.14159265358979;
+	const float PI = 3.14159265358979f;
+
 	float3 Cross(const float3& a, const float3& b);
 	float Dot(const float3& a, const float3& b);
 	float Dot(const float2& a, const float2& b);

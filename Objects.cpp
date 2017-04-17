@@ -227,24 +227,24 @@ MeshObj::MeshObj(unsigned int X, unsigned int Y, const std::string& texfilePath,
 			for(unsigned int j = 0; j < y-1; j++)
 			{
 				// Triangle One
-				vertices[vertCount] = float3(2 * float(i)/float(x-1) - 1, 2 * float(j)/float(y-1) - 1, 0);
+				vertices[vertCount] = float3(float(i)/float(x-1), float(j)/float(y-1), 0);
 		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j)/float(y-1));
 
-		        vertices[vertCount] = float3(2 * float(i+1)/float(x-1) - 1, 2 * float(j)/float(y-1) - 1, 0);
+		        vertices[vertCount] = float3(float(i+1)/float(x-1), float(j)/float(y-1), 0);
 		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
 
-		        vertices[vertCount] = float3(2 * float(i)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
+		        vertices[vertCount] = float3(float(i)/float(x-1), float(j+1)/float(y-1), 0);
 		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
 
 
 		        // Triangle Two
-				vertices[vertCount] = float3(2 * float(i+1)/float(x-1) - 1, 2 * float(j)/float(y-1) - 1, 0);
+				vertices[vertCount] = float3(float(i+1)/float(x-1), float(j)/float(y-1), 0);
 		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
 
-		        vertices[vertCount] = float3(2 * float(i+1)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
+		        vertices[vertCount] = float3(float(i+1)/float(x-1), float(j+1)/float(y-1), 0);
 		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j+1)/float(y-1));
 
-		        vertices[vertCount] = float3(2 * float(i)/float(x-1) - 1, 2 * float(j+1)/float(y-1) - 1, 0);
+		        vertices[vertCount] = float3(float(i)/float(x-1), float(j+1)/float(y-1), 0);
 		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
 			}
 		}
@@ -252,6 +252,32 @@ MeshObj::MeshObj(unsigned int X, unsigned int Y, const std::string& texfilePath,
 
 	SetupVerticesAndInitialize();
 	SetShaders(vertShaderFile, fragShaderFile, texfilePath);
+	SetXAxisRange(-1, 1);
+	SetYAxisRange(-1, 1);
+}
+
+void MeshObj::SetXAxisRange(float low, float high)
+{
+	if(high < low)
+	{
+		high = low;
+	}
+
+	xRange = float2(low, high);
+	GLuint xId = glGetUniformLocation(programId, "xRange");
+	glUniform2f(xId, low, high);
+}
+
+void MeshObj::SetYAxisRange(float low, float high)
+{
+	if(high < low)
+	{
+		high = low;
+	}
+
+	yRange = float2(low, high);
+	GLuint yId = glGetUniformLocation(programId, "yRange");
+	glUniform2f(yId, low, high);
 }
 
 
