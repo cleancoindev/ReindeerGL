@@ -18,13 +18,15 @@ class Object3D
 public:
 	Object3D() = delete;
 	Object3D(const Object3D& Src) = delete;
-	Object3D& operator=(Object3D& Src) = delete;
+	Object3D& operator=(const Object3D& Src) = delete;
 	virtual ~Object3D();
 
 	const std::string& GetLabel() const;
+	virtual std::shared_ptr<Object3D> MakeCopyNamed(const std::string& newLabel) const;
+
 	ObjectContainer& GetContainer();
 
-	virtual void Draw(const mat4& projectionViewMatrix) const;
+	virtual void Draw(const mat4& projectionViewMatrix);
 
 	void SetPosition(const float3& newPos);
 	void Translate(const float3& vector);
@@ -34,7 +36,7 @@ public:
 	void Transform(const mat4& transform);
 
 	void Texture(const std::string& ImgFilename);
-	void ColourSolid(const float3& redGreenBlue, float alpha = 1);		// [0 - 1] range
+	void ColourSolid(const float3& redGreenBlue);		// [0 - 1] range
 
 	bool Drawing2D() const;
 
@@ -56,7 +58,7 @@ protected:
 	// OpenGL stuff
 	float3* vertices;
 	float2* texCoords;
-	std::string TexFile;
+	std::string textureFilepath, vertShaderFile, fragShaderFile;
 	GLuint vaoId, vboId, texCoordBufferId, textureId;
 	const unsigned int verts, coords;
 	const GLenum mode;

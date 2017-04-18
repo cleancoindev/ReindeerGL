@@ -37,15 +37,18 @@ public:
 	bool IsFilling() const;
 	void SaveScreenshot(const std::string& filename);
 
-	std::shared_ptr<CubeObj> AddCube(const std::string& label, const std::string& textureFile);
-	void AddCube(const std::shared_ptr<CubeObj>& cube);
-	std::shared_ptr<LineObj> AddLine(const std::string& label, const std::string& textureFile);
-	void AddLine(const std::shared_ptr<LineObj>& cube);
-	std::shared_ptr<PlaneObj> AddPlane(const std::string& label, const std::string& textureFile);
-	void AddPlane(const std::shared_ptr<PlaneObj>& cube);
-	std::shared_ptr<Triangle> AddTriangle(const std::string& label, const std::string& textureFile);
-	void AddTriangle(const std::shared_ptr<Triangle>& tri);
-	void AddObject(const std::shared_ptr<Object3D>& object);
+	template<class subObject>
+	std::shared_ptr<subObject> AddNewObject(const std::string& newLabel, const std::string& optionalTextureFile = "")
+	{
+		std::shared_ptr<subObject> subObjPtr = std::make_shared<subObject>(newLabel, optionalTextureFile);
+		topLevelContainer.AddObjectPtr(OBJECT3D_PTR(subObjPtr));
+		return subObjPtr;
+	}
+	template<class subObject>
+	void AddAnObjectPtr(const std::shared_ptr<subObject>& subObjPtr)
+	{
+		topLevelContainer.AddObjectPtr(OBJECT3D_PTR(subObjPtr));
+	}
 
 	float FramesPerSecond() const;
 	GLuint WindowId() const;
@@ -54,6 +57,7 @@ public:
 	int Height() const;
 	void SetCurrentWindowSize(const unsigned int width, const unsigned int height);
 	void ShowCursor(bool show) const;
+
 
 private:
 	GLuint windowId;

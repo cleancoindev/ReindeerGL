@@ -139,63 +139,14 @@ void OpenGL::SaveScreenshot(const std::string& filename)
 
 	if(!SOIL_save_image(filename.c_str(), SOIL_SAVE_TYPE_BMP, width, height, 3, swapSpace))
 	{
-		std::cerr << "SaveScreenshot failed\n";
+		std::cerr << "SaveScreenshot(" << filename << ") failed\n";
 	}
 	else
 	{
-		std::cerr << "SaveScreenshot succeeded\n";
+		std::cerr << "SaveScreenshot(" << filename << ") succeeded\n";
 	}
 	delete[] img;
 	delete[] swapSpace;
-}
-
-std::shared_ptr<CubeObj> OpenGL::AddCube(const std::string& label, const std::string& textureFile)
-{
-	std::shared_ptr<CubeObj> cubePtr = std::make_shared<CubeObj>(label, textureFile);
-	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(cubePtr));
-	return cubePtr;
-}
-void OpenGL::AddCube(const std::shared_ptr<CubeObj>& cubePtr)
-{
-	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(cubePtr));
-}
-
-std::shared_ptr<LineObj> OpenGL::AddLine(const std::string& label, const std::string& textureFile)
-{
-	std::shared_ptr<LineObj> linePtr = std::make_shared<LineObj>(label, textureFile);
-	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(linePtr));
-	return linePtr;
-}
-void OpenGL::AddLine(const std::shared_ptr<LineObj>& linePtr)
-{
-	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(linePtr));
-}
-
-std::shared_ptr<PlaneObj> OpenGL::AddPlane(const std::string& label, const std::string& textureFile)
-{
-	std::shared_ptr<PlaneObj> planePtr = std::make_shared<PlaneObj>(label, textureFile);
-	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(planePtr));
-	return planePtr;
-}
-void OpenGL::AddPlane(const std::shared_ptr<PlaneObj>& planePtr)
-{
-	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(planePtr));
-}
-
-std::shared_ptr<Triangle> OpenGL::AddTriangle(const std::string& label, const std::string& textureFile)
-{
-	std::shared_ptr<Triangle> triPtr = std::make_shared<Triangle>(label, textureFile);
-	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(triPtr));
-	return triPtr;
-}
-void OpenGL::AddTriangle(const std::shared_ptr<Triangle>& triPtr)
-{
-	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(triPtr));
-}
-
-void OpenGL::AddObject(const std::shared_ptr<Object3D>& object)
-{
-	topLevelContainer.AddObjectPtr(object);
 }
 
 float OpenGL::FramesPerSecond() const

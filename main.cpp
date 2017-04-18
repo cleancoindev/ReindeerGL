@@ -45,6 +45,7 @@ void Display()
 	// 	cout << gl.Position.x() << ", " << gl.Position.y() << ", " << gl.Position.z() << endl;
 	// 	tick = 0;
 	// }
+
 	tick++;
 }
 
@@ -182,26 +183,30 @@ int main(int argc, char** argv)
 	glutReshapeFunc(Resize);
 
     tri = make_shared<Triangle>("Scaling triangle", "./Images/myPalette.png");
-    gl.AddTriangle(tri);
-
-    std::shared_ptr<Triangle> tri2 = make_shared<Triangle>("Sub-contained triangle", "");
-    tri2->ColourSolid(float3(1, 1, 0));
-    tri2->Translate(float3(0, 1.5, 0));
-    tri2->SetScale(float3(0.5f));
+    gl.AddAnObjectPtr<Triangle>(tri);
 
     // grvty = make_shared<GravityPlane>();
     // gl.AddObject(OBJECT3D_PTR(grvty));
     // grvty->SetScale(float3(0.5));
 
     std::shared_ptr<PlaneObj> pln = make_shared<PlaneObj>("ground", "./Images/deep_sea.png");
-    gl.AddPlane(pln);
+    gl.AddAnObjectPtr<PlaneObj>(pln);
     pln->Translate(float3(0, -1.01, 0));
     pln->Rotate(Quaternion(1, 0, 0, GLMath::PI/2));
     pln->SetScale(25.0f);
 
-    cube = gl.AddCube("spinning cube", "./Images/Globe.png");
+    cube = gl.AddNewObject<CubeObj>("spinning cube", "./Images/Globe.png");
     cube->SetPosition(float3(-10, 2, -5));
+
+    std::shared_ptr<Triangle> tri2 = make_shared<Triangle>("Sub-contained triangle", "");
+    tri2->ColourSolid(float3(1, 1, 0));
+    tri2->Translate(float3(0, 1.5, 0));
+    tri2->SetScale(float3(0.5f));
     cube->GetContainer().AddObjectPtr(tri2);
+    std::shared_ptr<Object3D> tri3 = tri2->MakeCopyNamed("Triangle copy demo");
+    tri3->ColourSolid(float3(0, 1, 0));
+    // gl.AddAnObjectPtr(tri3);
+    tri->GetContainer().AddObjectPtr(tri3);
 
     std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>("mesh graphing", 100, 100, "./Images/myPalette.png", "meshExample.glslv", "texture.glslf");
     mesh->SetPosition(float3(10, 0, -5));
@@ -209,7 +214,7 @@ int main(int argc, char** argv)
     mesh->Rotate(Quaternion(1, 0, 0, -GLMath::PI/2));
     mesh->SetXAxisRange(-5 * GLMath::PI, 5 * GLMath::PI);
     mesh->SetYAxisRange(-5 * GLMath::PI, 5 * GLMath::PI);
-    gl.AddObject(OBJECT3D_PTR(mesh));
+    gl.AddAnObjectPtr<MeshObj>(mesh);
 
     // myText = make_shared<Text2D>("text", "Hello world", 0.1, 0.1);
     // gl.AddObject(OBJECT3D_PTR(myText));

@@ -13,6 +13,7 @@ Object3D::Object3D(const std::string& label, int Verts, int Coords, int Mode) :
 	rotationMatrix = GLMath::Identity();
 	modelMatrix = GLMath::Identity();
 	scale = 1.0;
+	textureFilepath.clear();
 
 	initialized = false;
 	draw2D = false;
@@ -27,6 +28,32 @@ Object3D::Object3D(const std::string& label, int Verts, int Coords, int Mode) :
 
 	if(coords)
 		texCoords = new float2[coords];
+}
+
+std::shared_ptr<Object3D> Object3D::MakeCopyNamed(const std::string& label) const
+{
+	std::shared_ptr<Object3D> newObj(new Object3D(label, verts, coords, mode));
+	for(int i = 0; i < verts; i++)
+	{
+        	newObj->vertices[i] = vertices[i];
+	}
+	for(int i = 0; i < coords; i++)
+	{
+        	newObj->texCoords[i] = texCoords[i];
+	}
+
+	// Draw properties
+	newObj->SetPosition(position);
+	newObj->rotationMatrix = rotationMatrix;
+	newObj->velocity = velocity;
+	newObj->scale = scale;
+	newObj->draw2D = draw2D;
+	newObj->modelMatrix = modelMatrix;
+
+	newObj->SetupVerticesAndInitialize();
+	newObj->SetShaders(vertShaderFile, fragShaderFile, textureFilepath);
+
+	return newObj;
 }
 
 Object3D::~Object3D()
@@ -61,7 +88,7 @@ ObjectContainer& Object3D::GetContainer()
 	return container;
 }
 
-void Object3D::Draw(const mat4& projectionViewMatrix) const
+void Object3D::Draw(const mat4& projectionViewMatrix)
 {
 	if(!initialized)
 	{
@@ -147,6 +174,8 @@ void Object3D::Texture(const std::string& ImgFilename)
 	// Texture
 	if(ImgFilename.length())
 	{
+		textureFilepath = ImgFilename;
+
 		// Create texture VBO
 		glGenBuffers(1, &texCoordBufferId);
 		glEnableVertexAttribArray(1);
@@ -177,7 +206,7 @@ void Object3D::Texture(const std::string& ImgFilename)
 	glBindVertexArray(0);
 }
 
-void Object3D::ColourSolid(const float3& redGreenBlue, float alpha)
+void Object3D::ColourSolid(const float3& redGreenBlue)
 {
 	if(!initialized)
 	{
@@ -186,13 +215,17 @@ void Object3D::ColourSolid(const float3& redGreenBlue, float alpha)
 
 	glBindVertexArray(vaoId);
 
+	textureFilepath.clear();
+
 	// Shaders
 	ClearShaders();
-	Shaders::SetShaders(&programId, &vertexShaderId, &fragmentShaderId, "dummy.glslv", "colour.glslf");
+	vertShaderFile = "dummy.glslv";
+	fragShaderFile = "colour.glslf";
+	Shaders::SetShaders(&programId, &vertexShaderId, &fragmentShaderId, vertShaderFile, fragShaderFile);
 
 	// Colour
 	GLuint solidColourId = glGetUniformLocation(programId, "solidColour");
-	glUniform4f(solidColourId, redGreenBlue.x(), redGreenBlue.y(), redGreenBlue.z(), alpha);
+	glUniform4f(solidColourId, redGreenBlue.x(), redGreenBlue.y(), redGreenBlue.z(), 1);
 
 	glBindVertexArray(0);
 }
@@ -236,11 +269,15 @@ void Object3D::SetShaders(const std::string& vertName, const std::string& fragNa
 
 	// Shaders
 	ClearShaders();
+	vertShaderFile = vertName;
+	fragShaderFile = fragName;
 	Shaders::SetShaders(&programId, &vertexShaderId, &fragmentShaderId, vertName, fragName);
 
 	// Shader Image
 	if(ImgFilename.length())
 	{
+		textureFilepath = ImgFilename;
+
 		if(coords)
 		{
 			// Create texture VBO
@@ -287,6 +324,9 @@ void Object3D::ClearShaders()
 		glDeleteProgram(programId);
 		programId = 0;
 	}
+
+	vertShaderFile.clear();
+	fragShaderFile.clear();
 }
 
 void Object3D::UpdateModelMatrix()
