@@ -1,3 +1,4 @@
+#include "ObjectContainer.h"
 #include "ObjectsBase.h"
 #include "GLMath.h"
 
@@ -5,11 +6,13 @@
 #include <stdexcept>
 #include <iostream>
 
-Object3D::Object3D(int Verts, int Coords, int Mode) : verts(Verts), coords(Coords), mode(Mode)
+
+Object3D::Object3D(const std::string& label, int Verts, int Coords, int Mode) :
+	objectLabel(label), verts(Verts), coords(Coords), mode(Mode)
 {
 	rotationMatrix = GLMath::Identity();
+	modelMatrix = GLMath::Identity();
 	scale = 1.0;
-	Mass = 1;
 
 	initialized = false;
 	draw2D = false;
@@ -24,8 +27,6 @@ Object3D::Object3D(int Verts, int Coords, int Mode) : verts(Verts), coords(Coord
 
 	if(coords)
 		texCoords = new float2[coords];
-
-	modelMatrix = GLMath::Identity();
 }
 
 Object3D::~Object3D()
@@ -50,7 +51,17 @@ Object3D::~Object3D()
 	}
 }
 
-void Object3D::Draw(const mat4& projectionViewMatrix)
+const std::string & Object3D::GetLabel() const
+{
+	return objectLabel;
+}
+
+ObjectContainer& Object3D::GetContainer()
+{
+	return container;
+}
+
+void Object3D::Draw(const mat4& projectionViewMatrix) const
 {
 	if(!initialized)
 	{
@@ -65,6 +76,7 @@ void Object3D::Draw(const mat4& projectionViewMatrix)
 	glBindVertexArray(vaoId);
 	if(textureId)
 	{
+		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, textureId);
 	}
 
@@ -74,6 +86,13 @@ void Object3D::Draw(const mat4& projectionViewMatrix)
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glBindVertexArray(0);
+
+	// Now draw all sub-contained objects
+	for(ConstLabelObjectPair objectPair : container)
+	{
+		const std::shared_ptr<Object3D> object = objectPair.second;
+		object->Draw(mvp);
+	}
 }
 
 void Object3D::SetPosition(const float3& newPos)
@@ -178,17 +197,10 @@ void Object3D::ColourSolid(const float3& redGreenBlue, float alpha)
 	glBindVertexArray(0);
 }
 
-
 bool Object3D::Drawing2D() const
 {
 	return draw2D;
 }
-
-void Object3D::Set2D(bool rndr2d)
-{
-	draw2D = rndr2d;
-}
-
 
 void Object3D::SetupVerticesAndInitialize()
 {

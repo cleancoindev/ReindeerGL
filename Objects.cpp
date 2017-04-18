@@ -1,3 +1,4 @@
+#include "ObjectContainer.h"
 #include "Objects.h"
 
 float3 C_Vertices[36] = {
@@ -121,7 +122,7 @@ float2 C_TexCoords[36] = {
 	{float2(1, 0)}, // bottom rightSet2D
 };
 
-CubeObj::CubeObj(const std::string& texfilePath) : Object3D(36, 36, GL_TRIANGLES)
+CubeObj::CubeObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 36, 36, GL_TRIANGLES)
 {
 	for(unsigned int i = 0; i < verts; i++)
 	{
@@ -143,7 +144,7 @@ float2 L_TexCoords[2] = {
 	{float2(1, 1)}, // 1
 };
 
-LineObj::LineObj(const std::string& texfilePath) : Object3D(2, 2, GL_LINES)
+LineObj::LineObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 2, 2, GL_LINES)
 {
 	vertices[0] = L_Vertices[0];
 	vertices[1] = L_Vertices[1];
@@ -168,7 +169,7 @@ float2 P_TexCoords[4] = {
 	{float2(1, 1)}, // top right
 };
 
-PlaneObj::PlaneObj(const std::string& texfilePath) : Object3D(4, 4, GL_TRIANGLE_STRIP)
+PlaneObj::PlaneObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 4, 4, GL_TRIANGLE_STRIP)
 {
 	for(int i = 0; i < verts; i++)
 	{
@@ -180,17 +181,17 @@ PlaneObj::PlaneObj(const std::string& texfilePath) : Object3D(4, 4, GL_TRIANGLE_
 	Texture(texfilePath);
 }
 
-GravityPlane::GravityPlane() : Object3D(4, 4, GL_TRIANGLE_STRIP)
-{
-	for(int i = 0; i < verts; i++)
-	{
-		vertices[i] = P_Vertices[i];
-		texCoords[i] = P_TexCoords[i];
-	}
+// GravityPlane::GravityPlane() : Object3D(4, 4, GL_TRIANGLE_STRIP)
+// {
+// 	for(int i = 0; i < verts; i++)
+// 	{
+// 		vertices[i] = P_Vertices[i];
+// 		texCoords[i] = P_TexCoords[i];
+// 	}
 
-	SetupVerticesAndInitialize();
-	SetShaders("gravityTex.glslv", "gravityTex.glslf", "./Images/myPalette.png");
-}
+// 	SetupVerticesAndInitialize();
+// 	SetShaders("gravityTex.glslv", "gravityTex.glslf", "./Images/myPalette.png");
+// }
 
 
 float3 T_Vertices[3] = {
@@ -203,7 +204,7 @@ float2 T_TexCoords[3] = {
     float2(0.5, 1),
 	float2(0, 0),
 };
-Triangle::Triangle(const std::string& texfilePath) : Object3D(3, 3, GL_TRIANGLES)
+Triangle::Triangle(const std::string& label, const std::string& texfilePath) : Object3D(label, 3, 3, GL_TRIANGLES)
 {
 	for(int i = 0; i < verts; i++)
 	{
@@ -216,8 +217,8 @@ Triangle::Triangle(const std::string& texfilePath) : Object3D(3, 3, GL_TRIANGLES
 }
 
 
-MeshObj::MeshObj(unsigned int X, unsigned int Y, const std::string& texfilePath, const std::string& vertShaderFile, const std::string& fragShaderFile) :
-	x(X), y(Y), Object3D(3*2*(X-1)*(Y-1), 3*2*(X-1)*(Y-1), GL_TRIANGLES)
+MeshObj::MeshObj(const std::string& label, unsigned int X, unsigned int Y, const std::string& texfilePath, const std::string& vertShaderFile, const std::string& fragShaderFile) :
+	x(X), y(Y), Object3D(label, 3*2*(X-1)*(Y-1), 3*2*(X-1)*(Y-1), GL_TRIANGLES)
 {
 	if(y && x)
 	{

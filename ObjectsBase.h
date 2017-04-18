@@ -5,21 +5,26 @@
 #include <memory>
 #include <string>
 #include <SOIL/SOIL.h>
+#include <map>
 
 #include "Shaders.h"
 #include "GLMath.h"
 
+// Forward declare reference-looped class
+class ObjectContainer;
+
 class Object3D
 {
 public:
-	float Mass;
-
 	Object3D() = delete;
 	Object3D(const Object3D& Src) = delete;
 	Object3D& operator=(Object3D& Src) = delete;
-	~Object3D();
+	virtual ~Object3D();
 
-	virtual void Draw(const mat4& projectionViewMatrix);
+	const std::string& GetLabel() const;
+	ObjectContainer& GetContainer();
+
+	virtual void Draw(const mat4& projectionViewMatrix) const;
 
 	void SetPosition(const float3& newPos);
 	void Translate(const float3& vector);
@@ -29,33 +34,39 @@ public:
 	void Transform(const mat4& transform);
 
 	void Texture(const std::string& ImgFilename);
-	void ColourSolid(const float3& redGreenBlue, float alpha);		// [0 - 1] range
+	void ColourSolid(const float3& redGreenBlue, float alpha = 1);		// [0 - 1] range
 
 	bool Drawing2D() const;
-	void Set2D(bool render2Dimensional);
 
 protected:
+	// Unique label for the object (at least for the container its in)
+	const std::string objectLabel;
+
+	// A container of sub-contained items that we are responsible for the rendering of
+	ObjectContainer container;
+
+	// Draw properties
 	float3 position;
 	mat4 rotationMatrix;
 	float3 velocity;
 	float3 scale;
 	bool draw2D;
+	mat4 modelMatrix;
 
+	// OpenGL stuff
 	float3* vertices;
 	float2* texCoords;
 	std::string TexFile;
-	mat4 modelMatrix;
 	GLuint vaoId, vboId, texCoordBufferId, textureId;
 	const unsigned int verts, coords;
 	const GLenum mode;
-
 	GLuint programId, fragmentShaderId, vertexShaderId;
 	bool initialized;
 
+	// Allocate vertice and texCoord arrays from vert and coord counts, and set draw mode and label
+	Object3D(const std::string& label, int Verts, int Coords, int Mode);
 
-	Object3D(int Verts, int Coords, int Mode);
-
-	// // Creates VertexArrayObject and VertexBufferObjects for vertices and TexCoords
+	// // Creates VertexArrayObject and VertexBufferObject for vertices and TexCoords
 	void SetupVerticesAndInitialize();
 
 	// Opens the specified shader files & compiles/links them and opens ImgFilename as texture if non-empty
@@ -65,5 +76,6 @@ protected:
 		SetShaders("dummy.glslv", "dummy.glslf");
 	}
 
+	// Updates model matrix from position rotation and scale
 	void UpdateModelMatrix();
 };

@@ -75,8 +75,9 @@ void OpenGL::DrawAll()
 	// q2.Normalize3();
 	// mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.05f, 1000.0f) * GLMath::Rotate(q1*q2) * GLMath::Translate(-Position);
 
-	for(std::shared_ptr<Object3D> object : objects)
+	for(LabelObjectPair objectPair : topLevelContainer)
 	{
+		std::shared_ptr<Object3D> object = objectPair.second;
 		object->Draw(object->Drawing2D() ? twoDimensionalMatrix : projectionViewMatrix);
 	}
 
@@ -148,53 +149,53 @@ void OpenGL::SaveScreenshot(const std::string& filename)
 	delete[] swapSpace;
 }
 
-std::shared_ptr<CubeObj> OpenGL::AddCube(const std::string& textureFile)
+std::shared_ptr<CubeObj> OpenGL::AddCube(const std::string& label, const std::string& textureFile)
 {
-	std::shared_ptr<CubeObj> cubePtr = std::make_shared<CubeObj>(textureFile);
-	objects.push_back(OBJECT3D_PTR(cubePtr));
+	std::shared_ptr<CubeObj> cubePtr = std::make_shared<CubeObj>(label, textureFile);
+	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(cubePtr));
 	return cubePtr;
 }
 void OpenGL::AddCube(const std::shared_ptr<CubeObj>& cubePtr)
 {
-	objects.push_back(OBJECT3D_PTR(cubePtr));
+	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(cubePtr));
 }
 
-std::shared_ptr<LineObj> OpenGL::AddLine(const std::string& textureFile)
+std::shared_ptr<LineObj> OpenGL::AddLine(const std::string& label, const std::string& textureFile)
 {
-	std::shared_ptr<LineObj> linePtr = std::make_shared<LineObj>(textureFile);
-	objects.push_back(OBJECT3D_PTR(linePtr));
+	std::shared_ptr<LineObj> linePtr = std::make_shared<LineObj>(label, textureFile);
+	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(linePtr));
 	return linePtr;
 }
 void OpenGL::AddLine(const std::shared_ptr<LineObj>& linePtr)
 {
-	objects.push_back(OBJECT3D_PTR(linePtr));
+	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(linePtr));
 }
 
-std::shared_ptr<PlaneObj> OpenGL::AddPlane(const std::string& textureFile)
+std::shared_ptr<PlaneObj> OpenGL::AddPlane(const std::string& label, const std::string& textureFile)
 {
-	std::shared_ptr<PlaneObj> planePtr = std::make_shared<PlaneObj>(textureFile);
-	objects.push_back(OBJECT3D_PTR(planePtr));
+	std::shared_ptr<PlaneObj> planePtr = std::make_shared<PlaneObj>(label, textureFile);
+	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(planePtr));
 	return planePtr;
 }
 void OpenGL::AddPlane(const std::shared_ptr<PlaneObj>& planePtr)
 {
-	objects.push_back(OBJECT3D_PTR(planePtr));
+	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(planePtr));
 }
 
-std::shared_ptr<Triangle> OpenGL::AddTriangle(const std::string& textureFile)
+std::shared_ptr<Triangle> OpenGL::AddTriangle(const std::string& label, const std::string& textureFile)
 {
-	std::shared_ptr<Triangle> triPtr = std::make_shared<Triangle>(textureFile);
-	objects.push_back(OBJECT3D_PTR(triPtr));
+	std::shared_ptr<Triangle> triPtr = std::make_shared<Triangle>(label, textureFile);
+	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(triPtr));
 	return triPtr;
 }
 void OpenGL::AddTriangle(const std::shared_ptr<Triangle>& triPtr)
 {
-	objects.push_back(OBJECT3D_PTR(triPtr));
+	topLevelContainer.AddObjectPtr(OBJECT3D_PTR(triPtr));
 }
 
 void OpenGL::AddObject(const std::shared_ptr<Object3D>& object)
 {
-	objects.push_back(object);
+	topLevelContainer.AddObjectPtr(object);
 }
 
 float OpenGL::FramesPerSecond() const

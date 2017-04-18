@@ -1,4 +1,5 @@
 #include "OpenGL.h"
+//#include "Text2D.h"
 #include "Objects.h"
 
 #include <iostream>
@@ -16,7 +17,8 @@ bool shift = false;
 const float3 homePos(0, 0, 4);
 shared_ptr<Triangle> tri;
 shared_ptr<CubeObj> cube;
-shared_ptr<GravityPlane> grvty;
+// shared_ptr<GravityPlane> grvty;
+// shared_ptr<Text2D> myText;
 
 inline void MoveCam()
 {
@@ -179,23 +181,29 @@ int main(int argc, char** argv)
 	glutPassiveMotionFunc(MouseMotion);
 	glutReshapeFunc(Resize);
 
-    tri = make_shared<Triangle>("./Images/myPalette.png");
+    tri = make_shared<Triangle>("Scaling triangle", "./Images/myPalette.png");
     gl.AddTriangle(tri);
+
+    std::shared_ptr<Triangle> tri2 = make_shared<Triangle>("Sub-contained triangle", "");
+    tri2->ColourSolid(float3(1, 1, 0));
+    tri2->Translate(float3(0, 1.5, 0));
+    tri2->SetScale(float3(0.5f));
 
     // grvty = make_shared<GravityPlane>();
     // gl.AddObject(OBJECT3D_PTR(grvty));
     // grvty->SetScale(float3(0.5));
 
-    std::shared_ptr<PlaneObj> pln = make_shared<PlaneObj>("./Images/deep_sea.png");
+    std::shared_ptr<PlaneObj> pln = make_shared<PlaneObj>("ground", "./Images/deep_sea.png");
     gl.AddPlane(pln);
     pln->Translate(float3(0, -1.01, 0));
     pln->Rotate(Quaternion(1, 0, 0, GLMath::PI/2));
     pln->SetScale(25.0f);
 
-    cube = gl.AddCube("./Images/Globe.png");
+    cube = gl.AddCube("spinning cube", "./Images/Globe.png");
     cube->SetPosition(float3(-10, 2, -5));
+    cube->GetContainer().AddObjectPtr(tri2);
 
-    std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>(100, 100, "./Images/myPalette.png", "meshExample.glslv", "texture.glslf");
+    std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>("mesh graphing", 100, 100, "./Images/myPalette.png", "meshExample.glslv", "texture.glslf");
     mesh->SetPosition(float3(10, 0, -5));
     mesh->SetScale(float3(10, 10, 1));
     mesh->Rotate(Quaternion(1, 0, 0, -GLMath::PI/2));
@@ -203,13 +211,8 @@ int main(int argc, char** argv)
     mesh->SetYAxisRange(-5 * GLMath::PI, 5 * GLMath::PI);
     gl.AddObject(OBJECT3D_PTR(mesh));
 
-    // pnl->SetPosition(float3(0, 0, 0));
-    //shared_ptr<LineObj> line = make_shared<CubeObj>("./Images/Blue.png");
-    // shared_ptr<LineObj> line = make_shared<LineObj>("./Images/Blue.png");
-    // line->Rotate(Quaternion(0, 1, 0, 1.5));
-    //cube->Rotate(Quaternion(1,1,1,0.2));
-    //cube->SetPosition(float3(0, 0, 3));
-    // gl.AddObject(OBJECT3D_PTR(line));
+    // myText = make_shared<Text2D>("text", "Hello world", 0.1, 0.1);
+    // gl.AddObject(OBJECT3D_PTR(myText));
 
     gl.StartFPS();
     glutMainLoop();

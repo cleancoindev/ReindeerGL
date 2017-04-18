@@ -4,13 +4,14 @@
 #include <GL/glew.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
-#include <GL/glut.h>
+#include <GL/freeglut.h>
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <math.h>
 #include <SOIL/SOIL.h>
 
+#include "ObjectContainer.h"
 #include "Objects.h"
 #include "Shaders.h"
 #include "GLMath.h"
@@ -36,13 +37,13 @@ public:
 	bool IsFilling() const;
 	void SaveScreenshot(const std::string& filename);
 
-	std::shared_ptr<CubeObj> AddCube(const std::string& textureFile);
+	std::shared_ptr<CubeObj> AddCube(const std::string& label, const std::string& textureFile);
 	void AddCube(const std::shared_ptr<CubeObj>& cube);
-	std::shared_ptr<LineObj> AddLine(const std::string& textureFile);
+	std::shared_ptr<LineObj> AddLine(const std::string& label, const std::string& textureFile);
 	void AddLine(const std::shared_ptr<LineObj>& cube);
-	std::shared_ptr<PlaneObj> AddPlane(const std::string& textureFile);
+	std::shared_ptr<PlaneObj> AddPlane(const std::string& label, const std::string& textureFile);
 	void AddPlane(const std::shared_ptr<PlaneObj>& cube);
-	std::shared_ptr<Triangle> AddTriangle(const std::string& textureFile);
+	std::shared_ptr<Triangle> AddTriangle(const std::string& label, const std::string& textureFile);
 	void AddTriangle(const std::shared_ptr<Triangle>& tri);
 	void AddObject(const std::shared_ptr<Object3D>& object);
 
@@ -64,5 +65,5 @@ private:
 	float deltaTime;
 	const float fieldOfView = 90;
 
-	std::vector<std::shared_ptr<Object3D>> objects;
+	ObjectContainer topLevelContainer;
 };
