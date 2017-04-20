@@ -1,12 +1,28 @@
 OBJECTS=GLMath.o float3.o float2.o mat4.o Quaternion.o Shaders.o ObjectContainer.o OpenGL.o ObjectsBase.o Objects.o
 OUT=test
 
-make: main.cpp $(OBJECTS)
+PREFIX=/usr/local
+
+make: ./lib/libreindeergl.a
+	mkdir -p ./include
+	cp -f ./*.h ./include/
+
+all: test ./lib/libreindeergl.a
+
+install:
+	mkdir -p $(PREFIX)/include/reindeergl/
+	cp -f ./lib/* $(PREFIX)/lib/
+	cp -f ./include/* $(PREFIX)/include/reindeergl/
+
+test: main.cpp $(OBJECTS)
 	g++ -o $(OUT) -std=c++11 -O2 main.cpp $(OBJECTS) -lGLEW -lGLU -lglut -lGL -lSOIL
 
 clean:
-	rm *.o
-	rm $(OUT)
+	rm *.o $(OUT) ./lib/libreindeergl.a
+
+./lib/libreindeergl.a: $(OBJECTS)
+	mkdir -p ./lib
+	ar rvs ./lib/libreindeergl.a $(OBJECTS)
 
 OpenGL.o: OpenGL.cpp
 	g++ -c -o OpenGL.o --std=c++11 -O2 OpenGL.cpp
@@ -16,9 +32,6 @@ GLMath.o: GLMath.cpp
 
 ObjectContainer.o: ObjectContainer.cpp
 	g++ -c -o ObjectContainer.o --std=c++11 -O2 ObjectContainer.cpp
-
-OpenGL.o: OpenGL.cpp
-	g++ -c -o OpenGL.o --std=c++11 -O2 OpenGL.cpp
 
 Objects.o: Objects.cpp ObjectsBase.o
 	g++ -c -o Objects.o --std=c++11 -O2 Objects.cpp

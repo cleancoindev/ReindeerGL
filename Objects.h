@@ -23,14 +23,15 @@ public:
 	PlaneObj(const std::string& label, const std::string& texturePath);
 };
 
-// class SphereObj: public Object3D
-// {
-// public:
-// 	SphereObj(const std::string& label, unsigned int n, const std::string& texturePath);
+class SphereObj: public Object3D
+{
+public:
+ // Number of vertices = 3 * 8 * 4^n = 3 * 2^3 * 2^(2n) = 3 * 2^(2n + 3) (or 8*4^n triangles)
+	SphereObj(const std::string& label, const unsigned int n, const std::string& texturePath);
 
-// private:
-// 	unsigned int SphereFindPoint(unsigned int n);
-// };
+private:
+	float2 PointToTexcoord(const float3& normPoint);
+};
 
 class Triangle: public Object3D
 {

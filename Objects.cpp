@@ -1,6 +1,11 @@
 #include "ObjectContainer.h"
 #include "Objects.h"
 
+#include <array>
+#include <vector>
+#include <cmath>
+
+
 float3 C_Vertices[36] = {
 	// Front face
 	{float3(-1, -1,  1)}, // 2
@@ -122,7 +127,7 @@ float2 C_TexCoords[36] = {
 	{float2(1, 0)}, // bottom rightSet2D
 };
 
-CubeObj::CubeObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 36, 36, GL_TRIANGLES)
+CubeObj::CubeObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 36, true, GL_TRIANGLES)
 {
 	for(unsigned int i = 0; i < verts; i++)
 	{
@@ -144,7 +149,7 @@ float2 L_TexCoords[2] = {
 	{float2(1, 1)}, // 1
 };
 
-LineObj::LineObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 2, 2, GL_LINES)
+LineObj::LineObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 2, true, GL_LINES)
 {
 	vertices[0] = L_Vertices[0];
 	vertices[1] = L_Vertices[1];
@@ -169,7 +174,7 @@ float2 P_TexCoords[4] = {
 	{float2(1, 1)}, // top right
 };
 
-PlaneObj::PlaneObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 4, 4, GL_TRIANGLE_STRIP)
+PlaneObj::PlaneObj(const std::string& label, const std::string& texfilePath) : Object3D(label, 4, true, GL_TRIANGLE_STRIP)
 {
 	for(int i = 0; i < verts; i++)
 	{
@@ -204,7 +209,7 @@ float2 T_TexCoords[3] = {
     float2(0.5, 1),
 	float2(0, 0),
 };
-Triangle::Triangle(const std::string& label, const std::string& texfilePath) : Object3D(label, 3, 3, GL_TRIANGLES)
+Triangle::Triangle(const std::string& label, const std::string& texfilePath) : Object3D(label, 3, true, GL_TRIANGLES)
 {
 	for(int i = 0; i < verts; i++)
 	{
@@ -218,7 +223,7 @@ Triangle::Triangle(const std::string& label, const std::string& texfilePath) : O
 
 
 MeshObj::MeshObj(const std::string& label, unsigned int X, unsigned int Y, const std::string& texfilePath, const std::string& vertShaderFile, const std::string& fragShaderFile) :
-	x(X), y(Y), Object3D(label, 3*2*(X-1)*(Y-1), 3*2*(X-1)*(Y-1), GL_TRIANGLES)
+	x(X), y(Y), Object3D(label, 3*2*(X-1)*(Y-1), true, GL_TRIANGLES)
 {
 	if(y && x)
 	{
@@ -282,131 +287,106 @@ void MeshObj::SetYAxisRange(float low, float high)
 }
 
 
-// SphereObj::SphereObj(unsigned int n, float radius): Object3D()
-// {
-// 	mode = 4;
+namespace
+{
+	struct NormalizedTriangle
+	{
+		float3 a, b, c;
+	};
 
-// 	if(n == 0)
-// 		n = 1;
+	void SplitTriangle(const NormalizedTriangle& normTri, std::array<NormalizedTriangle, 4>& resTris)
+	{
+		float3 halfAB = (normTri.a + normTri.b)/2; halfAB.Normalize();
+		float3 halfBC = (normTri.b + normTri.c)/2; halfBC.Normalize();
+		float3 halfCA = (normTri.c + normTri.a)/2; halfCA.Normalize();
 
-// 	verts = 4 * n;
-// 	for(int k = 1; k < n; k++)
-// 		verts += 8 * (n-k);
+		// Tri around a
+		resTris[0].a = normTri.a;
+		resTris[0].b = halfAB;
+		resTris[0].c = halfCA;
 
-// 	verts += 2;
-// 	inds = ((verts * 2) - 4) * 3;
+		// .. b
+		resTris[1].a = halfAB;
+		resTris[1].b = normTri.b;
+		resTris[1].c = halfBC;
 
-// 	vertices = new Vertex3fColour[verts];
-// 	indices = new GLuint[inds];
+		// .. c
+		resTris[2].a = halfCA;
+		resTris[2].b = halfBC;
+		resTris[2].c = normTri.c;
 
-// 	vertices[0].Pos = float3(0, 1, 0);
-// 	Scale = float3(radius);
+		// Center Tri
+		resTris[3].a = halfCA;
+		resTris[3].b = halfAB;
+		resTris[3].c = halfBC;
+	}
+}
 
-// 	unsigned int MI = 1;	//MasterIndex for vertices
-// 	for(unsigned int iY = 1; iY < n + 1; iY++)		//Fills in top half
-// 	{
-// 		float ThetaY = (float(iY) / float(n)) * 0.5 * GLMath::PI;
-// 		for(unsigned int iX = 0; iX < (iY * 4); iX++)
-// 		{
-// 			float ThetaX = (float)iX/float(iY * 4) * 2 * GLMath::PI;
-// 			vertices[MI].Pos = float3(cosf(ThetaX) * sinf(ThetaY), cosf(ThetaY), sinf(ThetaX) * sinf(ThetaY));
-// 			MI++;
-// 		}
-// 	}
-// 	for(; MI < verts; MI++)		//Fills in bottom half
-// 	{
-// 		vertices[MI].Pos = vertices[(verts - 1) - MI].Pos;
-// 		vertices[MI].Pos.y *= -1;
-// 		vertices[MI].Pos.z *= -1;
-// 	}
+// Number of vertices = 3 * 8 * 4^n = 3 * 2^3 * 2^(2n) = 3 * 2^(2n + 3)
+SphereObj::SphereObj(const std::string& label, const unsigned int n, const std::string& texturePath) :
+	Object3D(label, 3 * (1 << (2*n + 3)), true, GL_TRIANGLES)
+{
+	std::vector<NormalizedTriangle> tris;
 
-	//First row
-// 	indices[0] = 0;
-// 	indices[1] = 1;
-// 	indices[2] = 2;
+	// Setup top triangles
+	tris.push_back({float3(0, 0, 1), float3(1, 0, 0), float3(0, 1, 0)});
+	tris.push_back({float3(1, 0, 0), float3(0, 0, -1), float3(0, 1, 0)});
+	tris.push_back({float3(0, 0, -1), float3(-1, 0, 0), float3(0, 1, 0)});
+	tris.push_back({float3(-1, 0, 0), float3(0, 0, 1), float3(0, 1, 0)});
 
-// 	indices[3] = 0;
-// 	indices[4] = 2;
-// 	indices[5] = 3;
+	// .. bottom triangles
+	tris.push_back({float3(1, 0, 0), float3(0, 0, 1), float3(0, -1, 0)});
+	tris.push_back({float3(0, 0, -1), float3(1, 0, 0), float3(0, -1, 0)});
+	tris.push_back({float3(-1, 0, 0), float3(0, 0, -1), float3(0, -1, 0)});
+	tris.push_back({float3(0, 0, 1), float3(-1, 0, 0), float3(0, -1, 0)});
 
-// 	indices[6] = 0;
-// 	indices[7] = 3;
-// 	indices[8] = 4;
+	std::vector<NormalizedTriangle> tempTris;
+	std::array<NormalizedTriangle, 4> resTris;
+	for(unsigned int i = 0; i < n; i++)
+	{
+		tempTris.clear();
+		for(unsigned int curTriIndex = 0; curTriIndex < tris.size(); curTriIndex++)
+		{
+			SplitTriangle(tris[curTriIndex], resTris);
+			tempTris.push_back(resTris[0]);
+			tempTris.push_back(resTris[1]);
+			tempTris.push_back(resTris[2]);
+			tempTris.push_back(resTris[3]);
+		}
+		tris = std::move(tempTris);
+	}
 
-// 	indices[9] = 0;
-// 	indices[10] = 1;
-// 	indices[11] = 4;
-// 	MI = 12;
+	for(unsigned int i = 0; i < tris.size(); i++)
+	{
+		vertices[3*i] = tris[i].a;
+		vertices[3*i + 1] = tris[i].b;
+		vertices[3*i + 2] = tris[i].c;
 
-// 	unsigned int Corns = 3;
-// 	for(unsigned int iY = 1; iY < n; iY++)		//Fills in top half
-// 	{
-// 		for(unsigned int iX = 0; iX < (iY * 4); iX++)
-// 		{
-// 			unsigned int self = SphereFindPoint(iY-1) + iX;			//Find our fucking self....
+        texCoords[3*i] = PointToTexcoord(tris[i].a);
+        texCoords[3*i + 1] = PointToTexcoord(tris[i].b);
+        texCoords[3*i + 2] = PointToTexcoord(tris[i].c);
 
-// 			float ratio = float(iX) / float(iY * 4);
-			//			0/4			  1/4			   2/4			   3/4
-// 			if(ratio == 0 || ratio == 0.25 || ratio == 0.5 || ratio == 0.75)		//are we at a corner? (0-3 == 4 corners)
-// 			{
-// 				Corns++;
+        // This fixes awkward unwinding at 99/100 * 2pi -> 0
+        if(tris[i].a.z() < 0 || tris[i].b.z() < 0 || tris[i].c.z() < 0)
+        {
+        	texCoords[3*i].x() = 1 - texCoords[3*i].x();
+        	texCoords[3*i + 1].x() = 1 - texCoords[3*i + 1].x();
+        	texCoords[3*i + 2].x() = 1 - texCoords[3*i + 2].x();
+        }
+	}
 
-// 				unsigned int* points = new unsigned int[4];
-// 				if(iX == 0)
-// 					points[0] = SphereFindPoint(iY+1) - 1;					//final point in their row
-// 				else
-// 					points[0] = self + Corns - 1;
+	SetupVerticesAndInitialize();
+	SetShaders("sphereTexture.glslv", "sphereTexture.glslf", texturePath);
+}
 
-// 				points[1] = self + Corns;
-// 				points[2] = self + Corns + 1;
-// 				if(self == SphereFindPoint(iY) - 1)
-// 					points[3] = SphereFindPoint(iY-1);
-// 				else
-// 					points[3] = self + 1;
+float2 SphereObj::PointToTexcoord(const float3& normPoint)
+{
+	float xzProjectionLength = sqrt(normPoint.x() * normPoint.x() + normPoint.z() * normPoint.z());
+	float uCoord = fabs(asin(normPoint.z() / xzProjectionLength));
+	uCoord = normPoint.x() >= 0 ? (GLMath::PI - uCoord) : uCoord;
+	uCoord /= (2*GLMath::PI);
 
-// 				for(int i = 0; i < 3; i++)
-// 				{
-// 					indices[MI] = self;
-// 					MI++;
-// 					indices[MI] = points[i];
-// 					MI++;
-// 					indices[MI] = points[i+1];
-// 					MI++;
-// 				}
-// 				delete[] points;
-// 			}
-// 			else
-// 			{
-// 				unsigned int* points = new unsigned int[3];
-// 				points[0] = self + Corns;
-// 				points[1] = self + Corns + 1;
-// 				if(self == SphereFindPoint(iY) - 1)
-// 					points[2] = SphereFindPoint(iY-1);
-// 				else
-// 					points[2] = self + 1;
+	float vCoord = (asin(normPoint.y()) + GLMath::PI/2) / GLMath::PI;
 
-// 				for(int i = 0; i < 2; i++)
-// 				{
-// 					indices[MI] = self;
-// 					MI++;
-// 					indices[MI] = points[i];
-// 					MI++;
-// 					indices[MI] = points[i+1];
-// 					MI++;
-// 				}
-// 				delete[] points;
-// 			}
-// 		}
-// 	}
-// 	for(; MI < inds; MI++)		//Fills in bottom half
-// 	{
-// 		indices[MI] = indices[(inds - 1) - MI];
-// 		indices[MI] = (verts-1) - indices[MI];
-// 	}
-// }
-
-// unsigned int SphereObj::SphereFindPoint(unsigned int n)
-// {
-// 	unsigned int tn = 4 * (n - 1);		//no +4 here so...
-// 	return ((tn + 8) * n / 2) + 1;		//+8 here
-// }
+	return std::move(float2(uCoord, vCoord));
+}

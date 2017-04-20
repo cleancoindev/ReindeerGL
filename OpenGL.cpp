@@ -54,7 +54,7 @@ void OpenGL::GLInit(int argc, char** argv, int widthIn, int heightIn, const std:
 	// glEnable(GL_CULL_FACE);
 	// glFrontFace(GL_CCW);
 
-	glClearColor(0.1, 0.1, 0.2, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	int fbWidth = width, fbHeight = height;
 	glViewport(0, 0, fbWidth, fbHeight);
 }

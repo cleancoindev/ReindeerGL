@@ -7,8 +7,8 @@
 #include <iostream>
 
 
-Object3D::Object3D(const std::string& label, int Verts, int Coords, int Mode) :
-	objectLabel(label), verts(Verts), coords(Coords), mode(Mode)
+Object3D::Object3D(const std::string& label, int Verts, bool UseCoords, int Mode) :
+	objectLabel(label), verts(Verts), useCoords(UseCoords), mode(Mode)
 {
 	rotationMatrix = GLMath::Identity();
 	modelMatrix = GLMath::Identity();
@@ -26,18 +26,18 @@ Object3D::Object3D(const std::string& label, int Verts, int Coords, int Mode) :
 	if(verts)
 		vertices = new float3[verts];
 
-	if(coords)
-		texCoords = new float2[coords];
+	if(useCoords)
+		texCoords = new float2[verts];
 }
 
 std::shared_ptr<Object3D> Object3D::MakeCopyNamed(const std::string& label) const
 {
-	std::shared_ptr<Object3D> newObj(new Object3D(label, verts, coords, mode));
+	std::shared_ptr<Object3D> newObj(new Object3D(label, verts, useCoords, mode));
 	for(int i = 0; i < verts; i++)
 	{
         	newObj->vertices[i] = vertices[i];
 	}
-	for(int i = 0; i < coords; i++)
+	for(int i = 0; i < verts; i++)
 	{
         	newObj->texCoords[i] = texCoords[i];
 	}
@@ -61,7 +61,7 @@ Object3D::~Object3D()
 	if(verts)
 		delete[] vertices;
 
-	if(coords)
+	if(useCoords)
 		delete[] texCoords;
 
 	if(initialized)
@@ -180,12 +180,12 @@ void Object3D::Texture(const std::string& ImgFilename)
 		glGenBuffers(1, &texCoordBufferId);
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, texCoordBufferId);
-		float* tempCoords = new float[2 * coords];
-		for(unsigned int i = 0; i < coords; i++)
+		float* tempCoords = new float[2 * verts];
+		for(unsigned int i = 0; i < verts; i++)
 		{
 			memcpy(&tempCoords[2*i], texCoords[i].n, sizeof(float) * 2);
 		}
-		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * coords, tempCoords, GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * verts, tempCoords, GL_STATIC_DRAW);
 		delete[] tempCoords;
 		glVertexAttribPointer((GLuint)1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 
@@ -278,18 +278,18 @@ void Object3D::SetShaders(const std::string& vertName, const std::string& fragNa
 	{
 		textureFilepath = ImgFilename;
 
-		if(coords)
+		if(useCoords)
 		{
 			// Create texture VBO
 			glGenBuffers(1, &texCoordBufferId);
 			glEnableVertexAttribArray(1);
 			glBindBuffer(GL_ARRAY_BUFFER, texCoordBufferId);
-			float* tempCoords = new float[2 * coords];
-			for(unsigned int i = 0; i < coords; i++)
+			float* tempCoords = new float[2 * verts];
+			for(unsigned int i = 0; i < verts; i++)
 			{
 				memcpy(&tempCoords[2*i], texCoords[i].n, sizeof(float) * 2);
 			}
-			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * coords, tempCoords, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 2 * verts, tempCoords, GL_STATIC_DRAW);
 			delete[] tempCoords;
 			glVertexAttribPointer((GLuint)1, 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0);
 		}

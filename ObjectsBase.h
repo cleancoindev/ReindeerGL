@@ -60,13 +60,14 @@ protected:
 	float2* texCoords;
 	std::string textureFilepath, vertShaderFile, fragShaderFile;
 	GLuint vaoId, vboId, texCoordBufferId, textureId;
-	const unsigned int verts, coords;
+	const unsigned int verts;
+	const bool useCoords;
 	const GLenum mode;
 	GLuint programId, fragmentShaderId, vertexShaderId;
 	bool initialized;
 
 	// Allocate vertice and texCoord arrays from vert and coord counts, and set draw mode and label
-	Object3D(const std::string& label, int Verts, int Coords, int Mode);
+	Object3D(const std::string& label, int Verts, bool UseTexCoords, int Mode);
 
 	// // Creates VertexArrayObject and VertexBufferObject for vertices and TexCoords
 	void SetupVerticesAndInitialize();

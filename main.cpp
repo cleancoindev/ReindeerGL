@@ -209,12 +209,16 @@ int main(int argc, char** argv)
     tri->GetContainer().AddObjectPtr(tri3);
 
     std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>("mesh graphing", 100, 100, "./Images/myPalette.png", "meshExample.glslv", "texture.glslf");
-    mesh->SetPosition(float3(10, 0, -5));
+    mesh->SetPosition(float3(10, 1, -5));
     mesh->SetScale(float3(10, 10, 1));
     mesh->Rotate(Quaternion(1, 0, 0, -GLMath::PI/2));
-    mesh->SetXAxisRange(-5 * GLMath::PI, 5 * GLMath::PI);
-    mesh->SetYAxisRange(-5 * GLMath::PI, 5 * GLMath::PI);
-    gl.AddAnObjectPtr<MeshObj>(mesh);
+    mesh->SetXAxisRange(-2 * GLMath::PI, 2 * GLMath::PI);
+    mesh->SetYAxisRange(-2* GLMath::PI, 2 * GLMath::PI);
+    //gl.AddAnObjectPtr<MeshObj>(mesh);
+
+    std::shared_ptr<SphereObj> sphere = make_shared<SphereObj>("sphereTests", 5, "./Images/Globe.png");
+    sphere->SetPosition(float3(0, 0, -10));
+	gl.AddAnObjectPtr<SphereObj>(sphere);
 
     // myText = make_shared<Text2D>("text", "Hello world", 0.1, 0.1);
     // gl.AddObject(OBJECT3D_PTR(myText));

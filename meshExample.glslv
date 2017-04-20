@@ -17,7 +17,8 @@ void main(void)
 
 		// Use original position though
 		vec3 pos = inPosition;
-		pos.z = cos(sqrt(dot(v, v)));
+		// pos.z = cos(sqrt(dot(v, v)));
+		pos.z = cos(v.x);
         gl_Position = MVP * vec4(pos, 1);
 
         // SOIL inverts images on load, this fixes...
