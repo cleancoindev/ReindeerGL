@@ -6,6 +6,9 @@
 #include <SOIL/SOIL.h>
 #include <string.h>
 
+#include <chrono>
+typedef std::chrono::high_resolution_clock NanoClock;
+
 
 OpenGL::OpenGL(int argc, char** argv, int width, int height, const std::string& title)
 {
@@ -51,12 +54,14 @@ void OpenGL::GLInit(int argc, char** argv, int widthIn, int heightIn, const std:
     glEnable( GL_BLEND );
 
 	// Objects should be created expecting CCW culling
-	// glEnable(GL_CULL_FACE);
-	// glFrontFace(GL_CCW);
+	glEnable(GL_CULL_FACE);
+	glFrontFace(GL_CCW);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
 	int fbWidth = width, fbHeight = height;
 	glViewport(0, 0, fbWidth, fbHeight);
+
+	StartFPS();
 }
 
 void OpenGL::DrawAll()
@@ -78,6 +83,11 @@ void OpenGL::DrawAll()
 	for(LabelObjectPair objectPair : topLevelContainer)
 	{
 		std::shared_ptr<Object3D> object = objectPair.second;
+
+		if(object->GetTickTock() != nullptr)
+		{
+			object->GetTickTock()(object, deltaTime);
+		}
 		object->Draw(object->Drawing2D() ? twoDimensionalMatrix : projectionViewMatrix);
 	}
 
@@ -88,19 +98,20 @@ void OpenGL::DrawAll()
 void OpenGL::CalcFPS()
 {
 	frameCount++;
-	currentTime = glutGet(GLUT_ELAPSED_TIME);
-	if(currentTime - previousTime > 200)
+	std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<float> delta = currentTime - previousTime;
+	if(delta.count() > 0.05f)
 	{
-		framesPerSecond = frameCount * 1000.0f / (currentTime - previousTime);
+		framesPerSecond = frameCount / delta.count();
 		deltaTime = 1.0f / framesPerSecond;
-		previousTime = currentTime;
-		frameCount = 0;
+		StartFPS();
 	}
 }
 
 void OpenGL::StartFPS()
 {
-	previousTime = glutGet(GLUT_ELAPSED_TIME);
+	frameCount = 0;
+	previousTime = std::chrono::high_resolution_clock::now();
 }
 
 void OpenGL::Fullscreen()

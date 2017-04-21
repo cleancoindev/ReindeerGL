@@ -10,6 +10,7 @@
 #include <memory>
 #include <math.h>
 #include <SOIL/SOIL.h>
+#include <chrono>
 
 #include "ObjectContainer.h"
 #include "Objects.h"
@@ -29,8 +30,6 @@ public:
 	OpenGL(int argc, char** argv, int width, int height, const std::string& Title);
 	void GLInit(int argc, char** argv, int width, int height, const std::string& Title);
 	void DrawAll();
-	void CalcFPS();
-	void StartFPS();
 	void Fullscreen();
 	bool IsFullscreen() const;
 	void Wireframe();
@@ -63,11 +62,14 @@ private:
 	GLuint windowId;
 	int width, height;
 	bool filling, fullscreen;
+	const float fieldOfView = 90;
+
 	unsigned int frameCount;
 	float framesPerSecond;
-	unsigned int currentTime, previousTime, elapsedTime;
+	std::chrono::high_resolution_clock::time_point previousTime;
 	float deltaTime;
-	const float fieldOfView = 90;
+	void CalcFPS();
+	void StartFPS();
 
 	ObjectContainer topLevelContainer;
 };

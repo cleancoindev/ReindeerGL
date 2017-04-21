@@ -10,7 +10,7 @@ OpenGL gl;
 unsigned int tick = 0;
 float maxIterations = 128;
 const float camSpeedSlow = 1;
-const float camSpeed = 4;
+const float camSpeed = 10;
 unsigned int KEYS = 0;
 bool autoScroll = false;
 bool shift = false;
@@ -25,26 +25,26 @@ inline void MoveCam()
 	gl.Position += (GLMath::RotateY(-gl.Rotation.y()) * gl.Velocity).Norm() * (shift ? camSpeedSlow : camSpeed) * gl.DeltaTime();
 }
 
+void CallbackTest(std::shared_ptr<Object3D>& obj, float deltaTime)
+{
+	float3 pos(obj->Position());
+	obj->SetVelocity(obj->Velocity() + float3(-10 * pos.x() * deltaTime, 0, 0));
+	obj->Translate(obj->Velocity() * deltaTime);
+	//obj->SetScale(float3(cosf(float(tick)/50.0f)));
+}
+
 void Display()
 {
 	MoveCam();
-	tri->SetPosition(float3(cosf(float(tick)/30.0f), 0, 0));
-	tri->SetScale(float3(cosf(float(tick)/50.0f)));
-	//tri->Transform(GLMath::RotateY(0.2f));
-	static Quaternion q(1, 1, 1, 1);
-	q.w = 4;
-	q.w *= gl.DeltaTime();
-	// grvty->Rotate(q);
-	cube->Rotate(q.Conjugate());
 
 	gl.DrawAll();
 
-	// if(tick / gl.FramesPerSecond() > 5)
-	// {
-	// 	cout << gl.FramesPerSecond() << endl;
-	// 	cout << gl.Position.x() << ", " << gl.Position.y() << ", " << gl.Position.z() << endl;
-	// 	tick = 0;
-	// }
+	if(tick / gl.FramesPerSecond() > 5)		// Print every 5 seconds
+	{
+		cout << gl.FramesPerSecond() << endl;
+		cout << gl.Position.x() << ", " << gl.Position.y() << ", " << gl.Position.z() << endl;
+		tick = 0;
+	}
 
 	tick++;
 }
@@ -160,8 +160,8 @@ void MouseMotion(int x, int y)
 		glutWarpPointer(gl.Width()/2, gl.Height()/2);
 
 	//Rotation around y axis depends on moving x coords :P
-	gl.Rotation.y() -= 0.015 * float(gl.Width() / 2 - x) * gl.DeltaTime();
-	gl.Rotation.x() -= 0.015 * float(gl.Height() / 2 - y) * gl.DeltaTime();
+	gl.Rotation.y() -= 0.01 * float(gl.Width() / 2 - x) * gl.DeltaTime();
+	gl.Rotation.x() -= 0.0075 * float(gl.Height() / 2 - y) * gl.DeltaTime();
 
 	if(gl.Rotation.x() > 1.570796)
 		gl.Rotation.x() = 1.570796;
@@ -183,6 +183,8 @@ int main(int argc, char** argv)
 	glutReshapeFunc(Resize);
 
     tri = make_shared<Triangle>("Scaling triangle", "./Images/myPalette.png");
+    tri->SetTickTock(CallbackTest);
+    tri->SetPosition(float3(-1, 0, 0));
     gl.AddAnObjectPtr<Triangle>(tri);
 
     // grvty = make_shared<GravityPlane>();
@@ -197,6 +199,12 @@ int main(int argc, char** argv)
 
     cube = gl.AddNewObject<CubeObj>("spinning cube", "./Images/Globe.png");
     cube->SetPosition(float3(-10, 2, -5));
+    cube->SetTickTock([](std::shared_ptr<Object3D>& obj, float deltaTime) {
+    	Quaternion q(1, 1, 1, 0);
+		q.Normalize3();
+		q.w = (2*GLMath::PI) / 60 * gl.DeltaTime();
+		obj->Rotate(q);
+	});
 
     std::shared_ptr<Triangle> tri2 = make_shared<Triangle>("Sub-contained triangle", "");
     tri2->ColourSolid(float3(1, 1, 0));
@@ -223,7 +231,6 @@ int main(int argc, char** argv)
     // myText = make_shared<Text2D>("text", "Hello world", 0.1, 0.1);
     // gl.AddObject(OBJECT3D_PTR(myText));
 
-    gl.StartFPS();
     glutMainLoop();
 
     return 0;

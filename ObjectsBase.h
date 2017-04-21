@@ -6,6 +6,7 @@
 #include <string>
 #include <SOIL/SOIL.h>
 #include <map>
+#include <functional>
 
 #include "Shaders.h"
 #include "GLMath.h"
@@ -27,12 +28,16 @@ public:
 	ObjectContainer& GetContainer();
 
 	virtual void Draw(const mat4& projectionViewMatrix);
+	void SetTickTock(std::function<void(std::shared_ptr<Object3D>&, float)> tickTock);
+	std::function<void(std::shared_ptr<Object3D>&, float)> GetTickTock() const;
 
 	void SetPosition(const float3& newPos);
+	const float3& Position() const;
 	void Translate(const float3& vector);
 	void SetScale(const float3& newScale);
 	void Rotate(const Quaternion& rotation);
 	void SetVelocity(const float3& velocity);
+	const float3& Velocity() const;
 	void Transform(const mat4& transform);
 
 	void Texture(const std::string& ImgFilename);
@@ -68,6 +73,9 @@ protected:
 
 	// Allocate vertice and texCoord arrays from vert and coord counts, and set draw mode and label
 	Object3D(const std::string& label, int Verts, bool UseTexCoords, int Mode);
+
+	// An update callback for applying things over time (passes self and delta time between frames)
+	std::function<void(std::shared_ptr<Object3D>&, float)> tickTockCallback;
 
 	// // Creates VertexArrayObject and VertexBufferObject for vertices and TexCoords
 	void SetupVerticesAndInitialize();

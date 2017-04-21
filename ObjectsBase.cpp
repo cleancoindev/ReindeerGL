@@ -22,6 +22,7 @@ Object3D::Object3D(const std::string& label, int Verts, bool UseCoords, int Mode
 	vboId = 0;
 	textureId = 0;
 	texCoordBufferId = 0;
+	tickTockCallback = nullptr;
 
 	if(verts)
 		vertices = new float3[verts];
@@ -122,10 +123,25 @@ void Object3D::Draw(const mat4& projectionViewMatrix)
 	}
 }
 
+void Object3D::SetTickTock(std::function<void(std::shared_ptr<Object3D>&, float)> tickTock)
+{
+	tickTockCallback = tickTock;
+}
+
+std::function<void(std::shared_ptr<Object3D>&, float)> Object3D::GetTickTock() const
+{
+	return tickTockCallback;
+}
+
 void Object3D::SetPosition(const float3& newPos)
 {
 	position = newPos;
 	UpdateModelMatrix();
+}
+
+const float3& Object3D::Position() const
+{
+	return position;
 }
 
 void Object3D::Translate(const float3& vector)
@@ -150,6 +166,11 @@ void Object3D::SetVelocity(const float3& velocity)
 {
 	this->velocity = velocity;
 	UpdateModelMatrix();
+}
+
+const float3& Object3D::Velocity() const
+{
+	return velocity;
 }
 
 void Object3D::Transform(const mat4& transform)
