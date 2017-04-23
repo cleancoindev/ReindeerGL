@@ -12,6 +12,7 @@
 #include "GLMath.h"
 
 // Forward declare reference-looped class
+#include "ObjectContainer.h"
 class ObjectContainer;
 
 class Object3D
@@ -35,6 +36,7 @@ public:
 	const float3& Position() const;
 	void Translate(const float3& vector);
 	void SetScale(const float3& newScale);
+	const float3& GetScale() const;
 	void Rotate(const Quaternion& rotation);
 	void SetVelocity(const float3& velocity);
 	const float3& Velocity() const;

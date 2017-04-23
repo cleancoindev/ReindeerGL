@@ -156,6 +156,11 @@ void Object3D::SetScale(const float3& newScale)
 	UpdateModelMatrix();
 }
 
+const float3& Object3D::GetScale() const
+{
+	return scale;
+}
+
 void Object3D::Rotate(const Quaternion& Rotation)
 {
 	rotationMatrix = GLMath::Rotate(Rotation) * rotationMatrix;

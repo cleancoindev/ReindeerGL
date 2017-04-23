@@ -4,8 +4,6 @@ OUT=test
 PREFIX=/usr/local
 
 make: ./lib/libreindeergl.a
-	mkdir -p ./include
-	cp -f ./*.h ./include/
 
 all: test ./lib/libreindeergl.a
 
@@ -15,7 +13,7 @@ install:
 	cp -f ./include/* $(PREFIX)/include/reindeergl/
 
 test: main.cpp $(OBJECTS)
-	g++ -o $(OUT) -std=c++11 -O2 main.cpp $(OBJECTS) -lGLEW -lGLU -lglut -lGL -lSOIL
+	g++ -o $(OUT) --std=c++11 -O2 main.cpp $(OBJECTS) -lGLEW -lGLU -lglut -lGL -lSOIL
 
 clean:
 	rm *.o $(OUT) ./lib/libreindeergl.a
@@ -23,6 +21,8 @@ clean:
 ./lib/libreindeergl.a: $(OBJECTS)
 	mkdir -p ./lib
 	ar rvs ./lib/libreindeergl.a $(OBJECTS)
+	mkdir -p ./include
+	cp -f ./*.h ./include/
 
 OpenGL.o: OpenGL.cpp
 	g++ -c -o OpenGL.o --std=c++11 -O2 OpenGL.cpp

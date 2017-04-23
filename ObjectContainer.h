@@ -19,6 +19,8 @@ public:
 	const std::shared_ptr<Object3D> At(const std::string& uniqueLabel) const;
 	void Remove(const std::string& uniqueLabel);
 	void Remove(const std::shared_ptr<Object3D>& objectWithLabel);
+	unsigned int Size() const;
+
 	std::shared_ptr<Object3D> operator[](const std::string& uniqueLabel);
 
 	ObjectIterator begin() noexcept;

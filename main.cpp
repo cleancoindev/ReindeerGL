@@ -225,7 +225,8 @@ int main(int argc, char** argv)
     //gl.AddAnObjectPtr<MeshObj>(mesh);
 
     std::shared_ptr<SphereObj> sphere = make_shared<SphereObj>("sphereTests", 5, "./Images/Globe.png");
-    sphere->SetPosition(float3(0, 0, -10));
+    sphere->SetPosition(float3(0, 1, -10));
+    sphere->SetScale(float3(2));
 	gl.AddAnObjectPtr<SphereObj>(sphere);
 
     // myText = make_shared<Text2D>("text", "Hello world", 0.1, 0.1);

@@ -21,6 +21,11 @@ void ObjectContainer::Remove(const std::shared_ptr<Object3D>& objectWithLabel)
 	objectPtrs.erase(objectWithLabel->GetLabel());
 }
 
+unsigned int ObjectContainer::Size() const
+{
+	return objectPtrs.size();
+}
+
 std::shared_ptr<Object3D> ObjectContainer::operator[](const std::string& uniqueLabel)
 {
 	return objectPtrs[uniqueLabel];
