@@ -68,6 +68,7 @@ void OpenGL::DrawAll()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH);
+	glEnable( GL_BLEND );
 	CalcFPS();
 
 	mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.05f, 1000.0f) * GLMath::Rotate(Rotation) * GLMath::Translate(-Position);
