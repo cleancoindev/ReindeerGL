@@ -270,6 +270,16 @@ void Object3D::SetupVerticesAndInitialize()
 	// VBO (Creating objects)
 	glGenBuffers(1, &vboId);														// One buffer per Object
 	glEnableVertexAttribArray(0);
+	UpdateVertices();
+	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
+
+	glBindVertexArray(0);
+	initialized = true;
+}
+
+void Object3D::UpdateVertices() const
+{
+	glBindVertexArray(vaoId);
 	glBindBuffer(GL_ARRAY_BUFFER, vboId);
 	float* tempVerts = new float[3 * verts];
 	for(unsigned int i = 0; i < verts; i++)
@@ -278,10 +288,6 @@ void Object3D::SetupVerticesAndInitialize()
 	}
 	glBufferData(GL_ARRAY_BUFFER, sizeof(float) * 3 * verts, tempVerts, GL_STATIC_DRAW);
 	delete[] tempVerts;
-	glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), 0);
-
-	glBindVertexArray(0);
-	initialized = true;
 }
 
 void Object3D::SetShaders(const std::string& vertName, const std::string& fragName, const std::string& ImgFilename)

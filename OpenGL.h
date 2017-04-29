@@ -49,6 +49,7 @@ public:
 		topLevelContainer.AddObjectPtr(OBJECT3D_PTR(subObjPtr));
 	}
 
+	void StartFPS();
 	float FramesPerSecond() const;
 	GLuint WindowId() const;
 	float DeltaTime() const;
@@ -69,7 +70,6 @@ private:
 	std::chrono::high_resolution_clock::time_point previousTime;
 	float deltaTime;
 	void CalcFPS();
-	void StartFPS();
 
 	ObjectContainer topLevelContainer;
 };

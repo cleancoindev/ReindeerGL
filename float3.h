@@ -28,6 +28,7 @@ public:
 	bool operator== (const float3& cmp) const;
 	float3& operator+= (const float3& Src);
 	float3& operator-= (const float3& Src);
+	float3& operator*= (float Num);
 
 	float3 operator+ (const float3& Src) const;
 	float3 operator- (const float3& Src) const;

@@ -1,6 +1,7 @@
 #include "OpenGL.h"
-//#include "Text2D.h"
+// #include "Text2D.h"
 #include "Objects.h"
+#include "SpringMesh.h"
 
 #include <iostream>
 
@@ -8,13 +9,12 @@ using namespace std;
 
 OpenGL gl;
 unsigned int tick = 0;
-float maxIterations = 128;
 const float camSpeedSlow = 1;
 const float camSpeed = 10;
 unsigned int KEYS = 0;
 bool autoScroll = false;
 bool shift = false;
-const float3 homePos(0, 0, 4);
+const float3 homePos(0, 1, 4);
 shared_ptr<Triangle> tri;
 shared_ptr<CubeObj> cube;
 // shared_ptr<GravityPlane> grvty;
@@ -30,7 +30,6 @@ void CallbackTest(std::shared_ptr<Object3D>& obj, float deltaTime)
 	float3 pos(obj->Position());
 	obj->SetVelocity(obj->Velocity() + float3(-10 * pos.x() * deltaTime, 0, 0));
 	obj->Translate(obj->Velocity() * deltaTime);
-	//obj->SetScale(float3(cosf(float(tick)/50.0f)));
 }
 
 void Display()
@@ -39,10 +38,10 @@ void Display()
 
 	gl.DrawAll();
 
-	if(tick / gl.FramesPerSecond() > 5)		// Print every 5 seconds
+	if(gl.FramesPerSecond() && tick / gl.FramesPerSecond() > 5)		// Print every 5 seconds
 	{
 		cout << gl.FramesPerSecond() << endl;
-		cout << gl.Position.x() << ", " << gl.Position.y() << ", " << gl.Position.z() << endl;
+		//cout << gl.Position.x() << ", " << gl.Position.y() << ", " << gl.Position.z() << endl;
 		tick = 0;
 	}
 
@@ -160,8 +159,8 @@ void MouseMotion(int x, int y)
 		glutWarpPointer(gl.Width()/2, gl.Height()/2);
 
 	//Rotation around y axis depends on moving x coords :P
-	gl.Rotation.y() -= 0.01 * float(gl.Width() / 2 - x) * gl.DeltaTime();
-	gl.Rotation.x() -= 0.0075 * float(gl.Height() / 2 - y) * gl.DeltaTime();
+	gl.Rotation.y() -= 0.001 * float(gl.Width() / 2 - x);
+	gl.Rotation.x() -= 0.00075 * float(gl.Height() / 2 - y);
 
 	if(gl.Rotation.x() > 1.570796)
 		gl.Rotation.x() = 1.570796;
@@ -172,6 +171,7 @@ void MouseMotion(int x, int y)
 int main(int argc, char** argv)
 {
 	gl.GLInit(argc, argv, 1200, 680, "TestGL");
+	glutWarpPointer(gl.Width()/2, gl.Height()/2);
 	gl.ShowCursor(false);
 
 	gl.Position = homePos;
@@ -181,57 +181,61 @@ int main(int argc, char** argv)
 	glutKeyboardUpFunc(KeyboardUp);
 	glutPassiveMotionFunc(MouseMotion);
 	glutReshapeFunc(Resize);
+	gl.Fullscreen();
 
-    tri = make_shared<Triangle>("Scaling triangle", "./Images/myPalette.png");
-    tri->SetTickTock(CallbackTest);
-    tri->SetPosition(float3(-1, 0, 0));
-    gl.AddAnObjectPtr<Triangle>(tri);
+    // tri = make_shared<Triangle>("Scaling triangle", "./Images/myPalette.png");
+    // tri->SetTickTock(CallbackTest);
+    // tri->SetPosition(float3(-1, 0, 0));
+    // gl.AddAnObjectPtr<Triangle>(tri);
 
-    // grvty = make_shared<GravityPlane>();
-    // gl.AddObject(OBJECT3D_PTR(grvty));
-    // grvty->SetScale(float3(0.5));
+    // std::shared_ptr<PlaneObj> pln = make_shared<PlaneObj>("ground", "./Images/deep_sea.png");
+    // gl.AddAnObjectPtr<PlaneObj>(pln);
+    // pln->Translate(float3(0, -1.01, 0));
+    // pln->Rotate(Quaternion(1, 0, 0, GLMath::PI/2));
+    // pln->SetScale(25.0f);
 
-    std::shared_ptr<PlaneObj> pln = make_shared<PlaneObj>("ground", "./Images/deep_sea.png");
-    gl.AddAnObjectPtr<PlaneObj>(pln);
-    pln->Translate(float3(0, -1.01, 0));
-    pln->Rotate(Quaternion(1, 0, 0, GLMath::PI/2));
-    pln->SetScale(25.0f);
+	// cube = gl.AddNewObject<CubeObj>("spinning cube", "./Images/Globe.png");
+	// cube->SetPosition(float3(-10, 2, -5));
+	// cube->SetTickTock([](std::shared_ptr<Object3D>& obj, float deltaTime) {
+	// 	Quaternion q(1, 1, 1, 0);
+	// 	q.Normalize3();
+	// 	q.w = (2*GLMath::PI) / 60 * gl.DeltaTime();
+	// 	obj->Rotate(q);
+	// });
 
-    cube = gl.AddNewObject<CubeObj>("spinning cube", "./Images/Globe.png");
-    cube->SetPosition(float3(-10, 2, -5));
-    cube->SetTickTock([](std::shared_ptr<Object3D>& obj, float deltaTime) {
-    	Quaternion q(1, 1, 1, 0);
-		q.Normalize3();
-		q.w = (2*GLMath::PI) / 60 * gl.DeltaTime();
-		obj->Rotate(q);
-	});
-
-    std::shared_ptr<Triangle> tri2 = make_shared<Triangle>("Sub-contained triangle", "");
-    tri2->ColourSolid(float3(1, 1, 0));
-    tri2->Translate(float3(0, 1.5, 0));
-    tri2->SetScale(float3(0.5f));
-    cube->GetContainer().AddObjectPtr(tri2);
-    std::shared_ptr<Object3D> tri3 = tri2->MakeCopyNamed("Triangle copy demo");
-    tri3->ColourSolid(float3(0, 1, 0));
+    // std::shared_ptr<Triangle> tri2 = make_shared<Triangle>("Sub-contained triangle", "");
+    // tri2->ColourSolid(float3(1, 1, 0));
+    // tri2->Translate(float3(0, 1.5, 0));
+    // tri2->SetScale(float3(0.5f));
+    // cube->GetContainer().AddObjectPtr(tri2);
+    // std::shared_ptr<Object3D> tri3 = tri2->MakeCopyNamed("Triangle copy demo");
+    // tri3->ColourSolid(float3(0, 1, 0));
     // gl.AddAnObjectPtr(tri3);
-    tri->GetContainer().AddObjectPtr(tri3);
+    // tri->GetContainer().AddObjectPtr(tri3);
 
-    std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>("mesh graphing", 100, 100, "./Images/myPalette.png", "meshExample.glslv", "texture.glslf");
-    mesh->SetPosition(float3(10, 1, -5));
+    // std::shared_ptr<MeshObj> mesh = make_shared<MeshObj>("mesh graphing", 100, 100, "./Images/myPalette.png", "meshExample.glslv", "texture.glslf");
+    // mesh->SetPosition(float3(10, 1, -5));
+    // mesh->SetScale(float3(10, 10, 1));
+    // mesh->Rotate(Quaternion(1, 0, 0, -GLMath::PI/2));
+    // mesh->SetXAxisRange(-2 * GLMath::PI, 2 * GLMath::PI);
+    // mesh->SetYAxisRange(-2* GLMath::PI, 2 * GLMath::PI);
+    // gl.AddAnObjectPtr<MeshObj>(mesh);
+
+    std::shared_ptr<SpringMesh> mesh = make_shared<SpringMesh>("spring bed", 53, 53, "./Images/Globe.png");
+    mesh->SetPosition(float3(-5, 0, 2));
     mesh->SetScale(float3(10, 10, 1));
     mesh->Rotate(Quaternion(1, 0, 0, -GLMath::PI/2));
-    mesh->SetXAxisRange(-2 * GLMath::PI, 2 * GLMath::PI);
-    mesh->SetYAxisRange(-2* GLMath::PI, 2 * GLMath::PI);
-    //gl.AddAnObjectPtr<MeshObj>(mesh);
+    gl.AddAnObjectPtr<SpringMesh>(mesh);
 
-    std::shared_ptr<SphereObj> sphere = make_shared<SphereObj>("sphereTests", 5, "./Images/Globe.png");
-    sphere->SetPosition(float3(0, 1, -10));
-    sphere->SetScale(float3(2));
-	gl.AddAnObjectPtr<SphereObj>(sphere);
+	// std::shared_ptr<SphereObj> sphere = make_shared<SphereObj>("sphereTests", 5, "./Images/Globe.png");
+	// sphere->SetPosition(float3(0, 1, -10));
+	// sphere->SetScale(float3(2));
+	// gl.AddAnObjectPtr<SphereObj>(sphere);
 
     // myText = make_shared<Text2D>("text", "Hello world", 0.1, 0.1);
-    // gl.AddObject(OBJECT3D_PTR(myText));
+    // gl.AddObject(OBJECT3D_PTR(myText));/
 
+	gl.StartFPS();
     glutMainLoop();
 
     return 0;

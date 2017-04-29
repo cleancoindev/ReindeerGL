@@ -4,6 +4,7 @@
 #include <array>
 #include <vector>
 #include <cmath>
+#include <stdexcept>
 
 
 float3 C_Vertices[36] = {
@@ -186,18 +187,6 @@ PlaneObj::PlaneObj(const std::string& label, const std::string& texfilePath) : O
 	Texture(texfilePath);
 }
 
-// GravityPlane::GravityPlane() : Object3D(4, 4, GL_TRIANGLE_STRIP)
-// {
-// 	for(int i = 0; i < verts; i++)
-// 	{
-// 		vertices[i] = P_Vertices[i];
-// 		texCoords[i] = P_TexCoords[i];
-// 	}
-
-// 	SetupVerticesAndInitialize();
-// 	SetShaders("gravityTex.glslv", "gravityTex.glslf", "./Images/myPalette.png");
-// }
-
 
 float3 T_Vertices[3] = {
     float3(1, -1, 0),
@@ -222,36 +211,46 @@ Triangle::Triangle(const std::string& label, const std::string& texfilePath) : O
 }
 
 
-MeshObj::MeshObj(const std::string& label, unsigned int X, unsigned int Y, const std::string& texfilePath, const std::string& vertShaderFile, const std::string& fragShaderFile) :
-	x(X), y(Y), Object3D(label, 3*2*(X-1)*(Y-1), true, GL_TRIANGLES)
+MeshObj::MeshObj(const std::string& label, unsigned int X, unsigned int Y, const std::string& texfilePath, const std::string& vertShaderFile, const std::string& fragShaderFile, const bool useTexCoords) :
+	x(X), y(Y), Object3D(label, 3*2*(X-1)*(Y-1), useTexCoords, GL_TRIANGLES)
 {
-	if(y && x)
+	if(X < 2 || Y < 2)
+		throw std::runtime_error("Incorrect mesh bounds");
+
+	unsigned int vertCount = 0;
+	for(int i = 0; i < x-1; i++)
 	{
-		unsigned int vertCount = 0;
+		for(unsigned int j = 0; j < y-1; j++)
+		{
+			// Triangle One
+			vertices[vertCount++] = float3(float(i)/float(x-1), float(j)/float(y-1), 0);
+	        vertices[vertCount++] = float3(float(i+1)/float(x-1), float(j)/float(y-1), 0);
+	        vertices[vertCount++] = float3(float(i)/float(x-1), float(j+1)/float(y-1), 0);
+
+	        // Triangle Two
+			vertices[vertCount++] = float3(float(i+1)/float(x-1), float(j)/float(y-1), 0);
+	        vertices[vertCount++] = float3(float(i+1)/float(x-1), float(j+1)/float(y-1), 0);
+	        vertices[vertCount++] = float3(float(i)/float(x-1), float(j+1)/float(y-1), 0);
+		}
+	}
+
+	if(useTexCoords)
+	{
+		vertCount = 0;
 		for(int i = 0; i < x-1; i++)
 		{
 			for(unsigned int j = 0; j < y-1; j++)
 			{
 				// Triangle One
-				vertices[vertCount] = float3(float(i)/float(x-1), float(j)/float(y-1), 0);
-		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j)/float(y-1));
-
-		        vertices[vertCount] = float3(float(i+1)/float(x-1), float(j)/float(y-1), 0);
-		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
-
-		        vertices[vertCount] = float3(float(i)/float(x-1), float(j+1)/float(y-1), 0);
-		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
+			    texCoords[vertCount++] = float2(float(i)/float(x-1), float(j)/float(y-1));
+			    texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
+			    texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
 
 
-		        // Triangle Two
-				vertices[vertCount] = float3(float(i+1)/float(x-1), float(j)/float(y-1), 0);
-		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
-
-		        vertices[vertCount] = float3(float(i+1)/float(x-1), float(j+1)/float(y-1), 0);
-		        texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j+1)/float(y-1));
-
-		        vertices[vertCount] = float3(float(i)/float(x-1), float(j+1)/float(y-1), 0);
-		        texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
+			    // Triangle Two
+			    texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j)/float(y-1));
+			    texCoords[vertCount++] = float2(float(i+1)/float(x-1), float(j+1)/float(y-1));
+			    texCoords[vertCount++] = float2(float(i)/float(x-1), float(j+1)/float(y-1));
 			}
 		}
 	}
@@ -269,6 +268,7 @@ void MeshObj::SetXAxisRange(float low, float high)
 		high = low;
 	}
 
+	glUseProgram(programId);
 	xRange = float2(low, high);
 	GLuint xId = glGetUniformLocation(programId, "xRange");
 	glUniform2f(xId, low, high);
@@ -281,9 +281,52 @@ void MeshObj::SetYAxisRange(float low, float high)
 		high = low;
 	}
 
+	glUseProgram(programId);
 	yRange = float2(low, high);
 	GLuint yId = glGetUniformLocation(programId, "yRange");
 	glUniform2f(yId, low, high);
+}
+
+void MeshObj::SetVertsFromGrid(const std::unique_ptr<float3[]>& posPtr)
+{
+	if(y && x)
+	{
+		unsigned int vertCount = 0;
+		for(int i = 0; i < x-1; i++)
+		{
+			for(unsigned int j = 0; j < y-1; j++)
+			{
+				// Triangle One
+				vertices[vertCount++] = posPtr[i*y + j];
+				vertices[vertCount++] = posPtr[(i+1)*y + j];
+				vertices[vertCount++] = posPtr[i*y + j+1];
+
+				// Triangle Two
+				vertices[vertCount++] = posPtr[(i+1)*y + j];
+				vertices[vertCount++] = posPtr[(i+1)*y + j+1];
+				vertices[vertCount++] = posPtr[i*y + j+1];
+			}
+		}
+	}
+
+	UpdateVertices();
+}
+
+std::unique_ptr<float3[]> MeshObj::CreateGridMesh(unsigned int X, unsigned int Y)
+{
+	std::unique_ptr<float3[]> pos(new float3[X*Y]);
+	if(X < 2 || Y < 2)
+		throw std::runtime_error("Incorrect mesh bounds");
+
+	for(int i = 0; i < X; i++)
+	{
+		for(unsigned int j = 0; j < Y; j++)
+		{
+			pos[i*Y + j] = float3(float(i)/float(X-1), float(j)/float(Y-1), 0);
+		}
+	}
+
+	return pos;
 }
 
 

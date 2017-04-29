@@ -12,8 +12,8 @@ install:
 	cp -f ./lib/* $(PREFIX)/lib/
 	cp -f ./include/* $(PREFIX)/include/reindeergl/
 
-test: main.cpp $(OBJECTS)
-	g++ -o $(OUT) --std=c++11 -O2 main.cpp $(OBJECTS) -lGLEW -lGLU -lglut -lGL -lSOIL
+test: main.cpp SpringMesh.cpp SpringMesh.h $(OBJECTS)
+	g++ -o $(OUT) --std=c++11 -O2 SpringMesh.cpp main.cpp $(OBJECTS) -lGLEW -lGLU -lglut -lGL -lSOIL
 
 clean:
 	rm *.o $(OUT) ./lib/libreindeergl.a

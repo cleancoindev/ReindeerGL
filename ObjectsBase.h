@@ -81,6 +81,7 @@ protected:
 
 	// // Creates VertexArrayObject and VertexBufferObject for vertices and TexCoords
 	void SetupVerticesAndInitialize();
+	void UpdateVertices() const;
 
 	// Opens the specified shader files & compiles/links them and opens ImgFilename as texture if non-empty
 	void SetShaders(const std::string& vertName, const std::string& fragName, const std::string& ImgFilename = "");

@@ -9,16 +9,24 @@ uniform vec2 yRange;
 
 #define PI 3.1415926535897932384626433832795
 
+float f(vec2 v)
+{
+	float r = 1;
+	r = cos(sqrt(dot(v, v)));
+	// r = cos(v.x)
+	return r;
+}
+
 void main(void)
 {
 		// Scale to input range
-		vec3 v = vec3((1 - inPosition.x) * xRange.x + inPosition.x * xRange.y,
-			(1 - inPosition.y) * yRange.x + inPosition.y * yRange.y, 0);
+		vec2 v = vec2((1 - inPosition.x) * xRange.x + inPosition.x * xRange.y,
+			(1 - inPosition.y) * yRange.x + inPosition.y * yRange.y);
 
 		// Use original position though
 		vec3 pos = inPosition;
-		// pos.z = cos(sqrt(dot(v, v)));
-		pos.z = cos(v.x);
+
+		pos.z = f(v);
         gl_Position = MVP * vec4(pos, 1);
 
         // SOIL inverts images on load, this fixes...

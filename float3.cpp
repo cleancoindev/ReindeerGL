@@ -132,6 +132,14 @@ float3& float3::operator-= (const float3& Src)
 	return *this;
 }
 
+float3& float3::operator*= (float Num)
+{
+	n[0] *= Num;
+	n[2] *= Num;
+	n[1] *= Num;
+	return *this;
+}
+
 float3 float3::operator+ (const float3& Src) const
 {
 	return float3(x() + Src.x(), y() + Src.y(), z() + Src.z());

@@ -19,9 +19,11 @@ void OpenGL::GLInit(int argc, char** argv, int widthIn, int heightIn, const std:
 {
 	filling = true;
 	fullscreen = false;
-	//Position = float3(1.570796327, 0, 0);
-	framesPerSecond = 60.0f;						// not the worst guess
+
+	// Ensure no progress until we get an accurate measure
+	framesPerSecond = 0.0f;
 	deltaTime = 0.0f;
+
 	width = widthIn;
 	height = heightIn;
 
@@ -58,17 +60,14 @@ void OpenGL::GLInit(int argc, char** argv, int widthIn, int heightIn, const std:
 	glFrontFace(GL_CCW);
 
 	glClearColor(0.0, 0.0, 0.0, 1.0);
-	int fbWidth = width, fbHeight = height;
-	glViewport(0, 0, fbWidth, fbHeight);
-
-	StartFPS();
+	glViewport(0, 0, width, height);
 }
 
 void OpenGL::DrawAll()
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glEnable(GL_DEPTH);
-	glEnable( GL_BLEND );
+	glEnable(GL_BLEND);
 	CalcFPS();
 
 	mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.05f, 1000.0f) * GLMath::Rotate(Rotation) * GLMath::Translate(-Position);
@@ -101,7 +100,7 @@ void OpenGL::CalcFPS()
 	frameCount++;
 	std::chrono::high_resolution_clock::time_point currentTime = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<float> delta = currentTime - previousTime;
-	if(delta.count() > 0.05f)
+	if(delta.count() > 0.2f &&  frameCount > 1)
 	{
 		framesPerSecond = frameCount / delta.count();
 		deltaTime = 1.0f / framesPerSecond;
