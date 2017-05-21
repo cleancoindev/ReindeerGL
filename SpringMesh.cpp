@@ -4,14 +4,14 @@
 #include "ObjectContainer.h"
 
 SpringMesh::SpringMesh(const std::string& label, unsigned int X, unsigned int Y, const std::string& texfilePath) :
-	MeshObj(label, X, Y, "", "positionColour.glslv", "positionColour.glslf", false)
+	MeshObj(label, X, Y, texfilePath, "positionColour.glslv", "positionColour.glslf", false)
+//	MeshObj(label, X, Y, texfilePath, "texture.glslv", "texture.glslf", true)
 {
 	velocities.reset(new float3[X*Y]);
 	positions = MeshObj::CreateGridMesh(X, Y);
 
 	// Testing
-	// positions[(1)*Y + Y/2] += float3(0, 0, 10);
-	// positions[(X-2)*Y + Y/2] -= float3(0, 0, 10);
+	positions[(X/2)*Y + Y/2] += float3(0, 0, 10);
 
 	this->SetTickTock(SpringMeshCallback);
 }

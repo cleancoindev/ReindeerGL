@@ -70,7 +70,7 @@ void OpenGL::DrawAll()
 	glEnable(GL_BLEND);
 	CalcFPS();
 
-	mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.05f, 1000.0f) * GLMath::Rotate(Rotation) * GLMath::Translate(-Position);
+	mat4 projectionViewMatrix = GLMath::Perspective(fieldOfView, float(width) / float(height), 0.05f, 1000.0f) * GLMath::Rotate(-Rotation) * GLMath::Translate(-Position);
 	mat4 twoDimensionalMatrix = GLMath::Scale(float3(float(height) / float(width), 1, 1));
 
 	// Experimental camera rotations

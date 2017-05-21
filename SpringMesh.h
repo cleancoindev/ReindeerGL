@@ -2,9 +2,9 @@
 #include <string>
 #include <memory>
 
-const float springConst = 10;
-const float3 gravityForce = float3(0, 0, -1);
-const float frictionConst = 0.2;
+const float springConst = 1;
+const float3 gravityForce = float3(0, 0, -0.2);
+const float frictionConst = 0.04;
 
 class SpringMesh : public MeshObj
 {

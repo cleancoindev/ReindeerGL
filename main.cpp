@@ -14,7 +14,8 @@ const float camSpeed = 10;
 unsigned int KEYS = 0;
 bool autoScroll = false;
 bool shift = false;
-const float3 homePos(0, 1, 4);
+const float3 homePos(0, 10, -3);
+const float3 homeRot(-GLMath::PI/2, 0, 0);
 shared_ptr<Triangle> tri;
 shared_ptr<CubeObj> cube;
 // shared_ptr<GravityPlane> grvty;
@@ -22,7 +23,7 @@ shared_ptr<CubeObj> cube;
 
 inline void MoveCam()
 {
-	gl.Position += (GLMath::RotateY(-gl.Rotation.y()) * gl.Velocity).Norm() * (shift ? camSpeedSlow : camSpeed) * gl.DeltaTime();
+	gl.Position += (GLMath::RotateY(gl.Rotation.y()) * gl.Velocity).Norm() * (shift ? camSpeedSlow : camSpeed) * gl.DeltaTime();
 }
 
 void CallbackTest(std::shared_ptr<Object3D>& obj, float deltaTime)
@@ -59,6 +60,7 @@ void Keyboard(unsigned char key, int x, int y)
 			break;
 		case 'h': case 'H':
 			gl.Position = homePos;
+			gl.Rotation = homeRot;
 			break;
 		case 'f': case 'F':
 			gl.Fullscreen();
@@ -159,8 +161,8 @@ void MouseMotion(int x, int y)
 		glutWarpPointer(gl.Width()/2, gl.Height()/2);
 
 	//Rotation around y axis depends on moving x coords :P
-	gl.Rotation.y() -= 0.001 * float(gl.Width() / 2 - x);
-	gl.Rotation.x() -= 0.00075 * float(gl.Height() / 2 - y);
+	gl.Rotation.y() += 0.001 * float(gl.Width() / 2 - x);
+	gl.Rotation.x() += 0.00075 * float(gl.Height() / 2 - y);
 
 	if(gl.Rotation.x() > 1.570796)
 		gl.Rotation.x() = 1.570796;
@@ -175,6 +177,7 @@ int main(int argc, char** argv)
 	gl.ShowCursor(false);
 
 	gl.Position = homePos;
+	gl.Rotation = homeRot;
 	glutDisplayFunc(Display);
 	glutIdleFunc(Display);
 	glutKeyboardFunc(Keyboard);
